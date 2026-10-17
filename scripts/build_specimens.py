@@ -64,6 +64,11 @@ figcaption{{margin-top:6px}}</style><div class="g">{cells}</div>'''
 
 
 def main(argv):
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8')
+        except (AttributeError, ValueError):
+            pass
     only_sheets = '--sheets' in argv
     files = [Path(a) for a in argv if a.endswith('.html')]
     names = [a for a in argv if not a.startswith('--') and not a.endswith('.html')]
@@ -74,7 +79,11 @@ def main(argv):
         return 2
     failed = []
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        try:
+            browser = p.chromium.launch()
+        except Exception as e:
+            print('Chromium 启动失败：', str(e).splitlines()[0], '\n装一下：python3 -m playwright install chromium')
+            return 2
         page = browser.new_page(viewport={'width': W, 'height': H})
         for src in files:
             try:

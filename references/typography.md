@@ -105,7 +105,7 @@ balance 只用于 ≤4 行的标题（算法限制 6 行且有性能成本）；
 | 9 | Cormorant Garamond + Work Sans | 高反差奢侈感：Cormorant 笔画极细，**必须 ≥40px 才成立**，小字号笔画会断；适合时尚/太空图录风 | 大胆 | Google Fonts |
 | 10 | Geist Mono / JetBrains Mono + Geist | 等宽当主角：命令行感、工程感；等宽只用于标签/编号/代码，整段正文用等宽是灾难（行长膨胀 30%） | 中性·技术 | Vercel / JetBrains 官方，均 OFL |
 
-**已被用烂名单**（AI 生成页面的指纹，用了等于自曝）：
+**已被用烂名单**（单款字体被 AI 工具用到泛滥，换平替通常更好）：
 
 | 烂大街 | 为什么烂 | 平替 |
 |--------|----------|------|
@@ -113,7 +113,8 @@ balance 只用于 ≤4 行的标题（算法限制 6 行且有性能成本）；
 | Inter 当 display | Inter 是为 UI 小字设计的，大字号下匀质无表情 | Archivo、Anton、Schibsted Grotesk |
 | Space Grotesk | 「科技感」的偷懒答案，泛滥于加密/AI 落地页 | Schibsted Grotesk、Familjen Grotesk |
 | Playfair Display | 「优雅」的偷懒答案，婚礼请柬既视感 | Cormorant（更极端）、DM Serif Display（更憨） |
-| 高反差衬线 display × 暖奶油底（不论哪款衬线） | 2026 年 AI 页面聚类的第一类：问题在组合不在字体，Newsreader 放在暖奶油底上和 Fraunces 一样是自曝 | 衬线放到有色底、深底或照片上；或者换成 grotesque / 宽体 / 等宽当 display |
+
+「高反差衬线 × 暖奶油底」这个**组合**不在名单里：它是一个外观家族，不是一款烂字体。用它可以，三个方向别都挤在这里、别每个项目都用它——那是外观账本管的事（`references/content-guidelines.md`）。
 
 ## 4. 中文排印（本文最重的一章）
 

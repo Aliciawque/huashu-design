@@ -327,7 +327,7 @@ def judge(f):
     if f['monoSmall'] >= 4:
         chrome.append(f'等宽小字标签 {f["monoSmall"]} 处')
     if chrome:
-        yellow.append('特征5·模板装饰：' + '；'.join(chrome))
+        yellow.append('模板装饰：' + '；'.join(chrome))
     if f['accentWord']:
         yellow.append(f'标题里只给一个词换色/斜体 {len(f["accentWord"])} 处（{f["accentWord"][:2]}）')
     if len(f['numbered']) >= 3:

@@ -9,7 +9,8 @@
 
   网址：用无头浏览器打开，截首屏（--full 截整页，最多 4000px 高）
   图片：本地路径或图片网址（.jpg/.png/.webp/.gif），直接放进板子
-  每个来源单独存一张（refs/ref-1.jpg …），再拼一张总板。打不开的会列出来，不会中断。
+  每个来源单独存一张（board-1.jpg …，跟总板同名加编号，不会覆盖你自己放进 refs/ 的截图），再拼一张总板。
+  打不开的、截出来几乎是一片纯色的（WebGL 站点常见），都会列出来，不会中断。
 
 拿到图后用你的看图能力打开总板，把「借的是什么」写成具体规则（网格几栏、标题和正文字号比、
 主色占比、图文关系），而不是「参考了它的风格」。
@@ -48,15 +49,19 @@ def shoot(page, src, out, full):
 
 
 def mostly_blank(path):
-    """截图几乎是一种颜色：WebGL 站点在无头浏览器里常常是黑的，懒加载的页面是白的。"""
+    """截图几乎是一种颜色：WebGL 站点在无头浏览器里常常是黑的，懒加载的页面是白的。
+
+    判据：和最多的那个颜色明显不同（亮度差 >24）的像素不到 0.8%。实测 WebGL 黑屏约 0.4%，
+    最空的极简设计（一个数字加一排细线）约 1.5%。没装 Pillow 时返回 None，表示判断不了。
+    """
     try:
         from PIL import Image
     except ImportError:
-        return False
-    im = Image.open(path).convert('L').resize((96, 60))
-    px = im.tobytes()
-    mean = sum(px) / len(px)
-    return sum(abs(v - mean) for v in px) / len(px) < 6
+        return None
+    from collections import Counter
+    px = Image.open(path).convert('L').resize((360, 225)).tobytes()
+    mode = Counter(px).most_common(1)[0][0]
+    return sum(1 for v in px if abs(v - mode) > 24) / len(px) < 0.008
 
 
 def board(page, shots, out):
@@ -76,6 +81,11 @@ figcaption{{margin-top:4px;word-break:break-all;color:#333}}</style><div class="
 
 
 def main(argv):
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8')
+        except (AttributeError, ValueError):
+            pass
     ap = argparse.ArgumentParser(description='把参考作品截成参考板')
     ap.add_argument('sources', nargs='+')
     ap.add_argument('--out', default='refs/board.jpg')
@@ -89,15 +99,24 @@ def main(argv):
         return 2
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    shots, failed = [], []
+    shots, failed, unchecked = [], [], False
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        try:
+            browser = p.chromium.launch()
+        except Exception as e:
+            print('Chromium 启动失败：', str(e).splitlines()[0])
+            print('装一下：python3 -m playwright install chromium')
+            return 2
         page = browser.new_page()
         for i, src in enumerate(a.sources, 1):
-            one = out.parent / f'ref-{i}.jpg'
+            one = out.with_name(f'{out.stem}-{i}.jpg')
+            if Path(src).exists() and Path(src).resolve() == one.resolve():
+                one = out.with_name(f'{out.stem}-{i}-shot.jpg')
             try:
                 shoot(page, src, one, a.full)
-                if mostly_blank(one):
+                blank = mostly_blank(one)
+                unchecked = unchecked or blank is None
+                if blank:
                     failed.append(src)
                     print('✗', src, '：截图几乎是一片纯色（WebGL/3D 站点或懒加载），等于没看到')
                     continue
@@ -109,7 +128,11 @@ def main(argv):
         if shots:
             board(page, shots, out)
             print('参考板 →', out)
+        elif out.exists():
+            out.unlink()   # 上一次的旧板，留着会被当成这次的
         browser.close()
+    if unchecked:
+        print('\n没装 Pillow（pip install pillow），没法自动判断截图是不是一片纯色：逐张打开看一眼再用。')
     if failed:
         print('\n打不开的来源（常见原因：反爬、要登录、地区限制）。换一个同作品的报道页或图片地址，'
               '或请用户发截图。不要凭印象假装看过。')

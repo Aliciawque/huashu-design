@@ -138,10 +138,10 @@ def harvest(project: Path):
                   approved.read_text(encoding='utf-8').strip()[:3000]]
     directions = project / 'directions.md'
     if directions.exists():
-        lines += ['', f'directions.md 在：{directions}（三张方向卡，对照他的选择看他偏向哪套逻辑、哪种力度，而不只是哪种颜色）']
-    demos = sorted((project / 'design-demos').glob('*.html')) if (project / 'design-demos').is_dir() else []
+        lines += ['', f'directions.md 在：{directions}（方向卡，对照他的选择看他偏向哪套逻辑、哪种力度，而不只是哪种颜色）']
+    demos = sorted((project / 'design-demos').glob('dir-*.html')) if (project / 'design-demos').is_dir() else []
     if demos:
-        lines.append(f'design-demos：{len(demos)} 个方向初稿')
+        lines.append(f'design-demos：{len(demos)} 个完整方向' + ('（另有缩略图 thumbs.html）' if (project / 'design-demos' / 'thumbs.html').exists() else ''))
     ledger = home() / 'ledger.jsonl'
     if ledger.exists():
         mine = [l for l in ledger.read_text(encoding='utf-8').splitlines()

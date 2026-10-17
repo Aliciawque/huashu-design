@@ -47,4 +47,4 @@ HTML deck（基础产物，永远先做）→ 完成后**自动**出 PDF → 用
 | 可编辑 PPTX · 路线 A | `references/editable-pptx.md` + `scripts/html2pptx.js` |
 | 可编辑 PPTX · 路线 B（已写好的视觉稿 / 甲方模板） | `references/pptx-from-rendered-html.md` + `scripts/pptx_from_rendered.py` |
 | 演讲者备注、Tweaks 调参 | `references/slide-decks.md`、`references/tweaks-system.md` |
-| 风格灵感（方向 C 轮盘的 PPT 分区） | `references/design-styles.md` |
+| 风格库与样张（秒数轮盘的 PPT 分区，外加跨媒介的中文与东亚分区） | `references/design-styles.md` |

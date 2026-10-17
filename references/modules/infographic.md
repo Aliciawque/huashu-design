@@ -34,6 +34,6 @@ python3 "$HD/scripts/design_lint.py" check info.html --viewport 1080x1350 --min-
 
 | 要做什么 | 读 |
 |---|---|
-| 风格灵感（方向 C 轮盘的信息图分区） | `references/design-styles.md` |
+| 风格库与样张（秒数轮盘的信息图分区，外加跨媒介的中文与东亚分区） | `references/design-styles.md` |
 | 封面、正文插图、长图的规格速查 | `references/scene-templates.md` |
 | 字体与中文排印 | `references/typography.md` |

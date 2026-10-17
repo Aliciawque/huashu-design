@@ -32,7 +32,7 @@ class LintFacts(unittest.TestCase):
         self.assertIn('暖纸衬线', fams)       # 暖奶油＋陶土色＋衬线：只作描述
         self.assertIn('卡片套件', fams)       # 同一圆角同一阴影的卡片：只作描述
         self.assertNotIn('暖纸衬线', text)    # 家族不再亮黄灯
-        self.assertIn('特征5', text)          # 全大写小标签、中点、箭头
+        self.assertIn('模板装饰', text)       # 全大写小标签、中点、箭头
         self.assertIn('只给一个词换色', text)
         self.assertIn('01/02/03', text)
 
@@ -166,6 +166,9 @@ class RefBoard(unittest.TestCase):
             im.save(real)
             self.assertTrue(ref_board.mostly_blank(blank))
             self.assertFalse(ref_board.mostly_blank(real))
+            # 极简设计不能被误判成没看到
+            sparse = HERE.parent.parent / 'assets' / 'style-specimens' / 'info' / '17-ma-emptiness.jpg'
+            self.assertFalse(ref_board.mostly_blank(sparse))
 
     def test_local_image_goes_on_the_board(self):
         from PIL import Image, ImageDraw
@@ -175,8 +178,8 @@ class RefBoard(unittest.TestCase):
             ImageDraw.Draw(im).rectangle([60, 60, 420, 440], fill=(200, 40, 40))
             im.save(src)
             out = Path(d) / 'refs' / 'board.jpg'
-            self.assertEqual(ref_board.main([str(FX / 'assets' / 'logo.png'), str(src), '--out', str(out)]), 0)
-            self.assertTrue(out.exists() and (out.parent / 'ref-2.jpg').exists())
+            self.assertEqual(ref_board.main([str(src), '--out', str(out)]), 0)
+            self.assertTrue(out.exists() and (out.parent / 'board-1.jpg').exists())
 
 
 if __name__ == '__main__':

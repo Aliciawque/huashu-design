@@ -182,7 +182,7 @@ python3 "$HD/scripts/learn.py" harvest <项目目录>                           
 4. deck 先只交 2 页代表页，其余页确认方向后分批做
 5. 检查点问答改成产出里的 assumption 清单，gate 文件照写
 
-降级牺牲流程，不牺牲反默认外观的底线、真实资产协议和可读性底线。
+降级牺牲流程，不牺牲真实资产协议、可读性底线，也不跳过三方向门。
 
 没有 fork-verifier 就用 `scripts/verify.py`；没有 Tweaks host 就用纯前端 localStorage 版（`references/tweaks-system.md`）；
 没有结构化问题 UI 就在对话里用 markdown 清单问；HTML 里要调 LLM 就用 mock 或让用户填自己的 key。

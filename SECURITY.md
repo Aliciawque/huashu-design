@@ -12,7 +12,7 @@ This document exhaustively declares every network destination, credential touchp
 | `openspeech.bytedance.com` (ByteDance official TTS API) | `scripts/cloud/tts-doubao.mjs` (also invoked by `scripts/narrate-pipeline.mjs`) | The narration text you want synthesized, with **your own** key. The endpoint is validated against a hardcoded hostname allowlist (`*.bytedance.com` / `*.volces.com`) — a tampered `.env` cannot redirect your key or text elsewhere | Only when you run it, and only after the consent gate |
 | `commons.wikimedia.org` (official Wikimedia API) | `scripts/fetch_images.py` | Image search keywords; downloads CC/public-domain images with license info printed for review | Only when the agent fetches stock imagery for a content design |
 | Brand official websites, `simpleicons.org`, Google favicon service | `references/brand-asset-protocol.md` (instructions, no script) | Plain GET requests to download publicly served logos/brand assets | Only when you ask for a brand-specific design |
-| Reference works the agent chose (any public URL or image URL) | `scripts/ref_board.py` | Plain GET via headless Chromium to screenshot a reference page or image, saved to the project's `refs/` folder | Only when the agent builds a reference board during the three-direction step |
+| Reference works the agent chose (any URL or image URL it passes; the script does not filter, so it would also open a local file or localhost address if given one) | `scripts/ref_board.py` | Plain GET via headless Chromium to screenshot a reference page or image, saved next to the board (default `refs/`) | Only when the agent builds a reference board during the three-direction step |
 | `fonts.googleapis.com`, `cdn.jsdelivr.net`, `unpkg.com` and similar CDNs | Static `<link>`/`<script>` tags inside demo/output HTML and the style specimens in `assets/style-specimens/` | Standard browser font/library fetches when *you* open a generated HTML file | Browser-side only; render scripts work offline-first |
 
 That is the entire list. `grep -rn "https://" --include="*.py" --include="*.mjs" --include="*.js" --include="*.sh" scripts/` to verify.
@@ -49,11 +49,11 @@ All subprocess calls invoke local media tools only: `ffmpeg`, `ffprobe`, `ffplay
 
 ## File deletion
 
-Recursive deletion is limited to temp directories the scripts themselves create with unique timestamp+PID names (`.video-tmp-*`, `.seek-tmp-*`, `_narration/.tmp`, Python `tempfile.TemporaryDirectory`). No script ever deletes user data or anything outside its own scratch space.
+`ref_board.py` and `build_specimens.py` write one temporary HTML page (`.board.html` / `.sheet.html`) next to their output and delete it after the screenshot; `ref_board.py` also removes its own previous board file when every source fails, so a stale board is not mistaken for a new one. Recursive deletion is limited to temp directories the scripts themselves create with unique timestamp+PID names (`.video-tmp-*`, `.seek-tmp-*`, `_narration/.tmp`, Python `tempfile.TemporaryDirectory`). No script ever deletes user data or anything outside its own scratch space.
 
 ## Dependencies
 
-Mainstream registry packages only (`playwright`, `sharp`, `pptxgenjs`, `pdf-lib`, `requests`), installed via standard `npm`/`pip`/`uv` — no binary downloads from arbitrary URLs. One documented exception to be aware of: `npx hyperframes init` (optional animation backend, see `references/hyperframes-backend.md`) installs 19 hyperframes documentation skills into `~/.claude/skills/`. This is called out with a warning in the docs before the command.
+Mainstream registry packages only (`playwright`, `pillow`, `sharp`, `pptxgenjs`, `pdf-lib`, `requests`), installed via standard `npm`/`pip`/`uv` — no binary downloads from arbitrary URLs. One documented exception to be aware of: `npx hyperframes init` (optional animation backend, see `references/hyperframes-backend.md`) installs 19 hyperframes documentation skills into `~/.claude/skills/`. This is called out with a warning in the docs before the command.
 
 ## Hooks
 

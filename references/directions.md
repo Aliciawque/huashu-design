@@ -58,7 +58,7 @@ python3 "$HD/scripts/design_lint.py" ledger                     # 最近交付�
   ```
 
   用看图能力打开参考板，把借的东西写成具体规则：网格几栏、标题和正文字号比、主色占比、图文关系。截不到（反爬、WebGL 黑屏）就换同作品的报道页或图片，或请用户发截图；都不行就在卡上写「未亲眼看到」，不假装看过。
-- **秒数轮盘 ×2**：取当前秒数 S（`date +%S`；Windows PowerShell 用 `(Get-Date).Second`），从 `references/design-styles.md` 对应分区抽 `S % 分区风格数 + 1` 号，再从 east 分区抽 `S % 12 + 1` 号。先打开抽到风格的样张图（条目里的「样张」一行），看清它做到位的样子再写卡。抽到和外观账本最近 3 个交付同类的，顺延下一号；还原度 <70% 的标注哪部分降级。轮盘的作用是把你带去自己不会主动选的地方。
+- **秒数轮盘 ×2**：取当前秒数 S（`date +%S`；Windows PowerShell 用 `(Get-Date).Second`），从 `references/design-styles.md` 对应分区抽 `S % 分区风格数 + 1` 号，再从 east 分区抽 `S % 12 + 1` 号。编号就是条目在分区里出现的顺序，和样张文件名、总览图格子上的编号一致。先打开抽到风格的样张图（条目里的「样张」一行），看清它做到位的样子再写卡。抽到和外观账本最近 3 个交付同类的，顺延下一号；还原度 <70% 的标注哪部分降级。轮盘的作用是把你带去自己不会主动选的地方。
 
 **用户指定了风格或品牌时**：六个候选都在那个语境里各出一种诠释，颜色可以都受品牌约束（compare 加 `--brand`，只比骨架）；轮盘只在和语境兼容的风格里抽。「Apple 风格」是一个语境不是一个设计。
 
@@ -101,7 +101,7 @@ python3 "$HD/scripts/design_lint.py" ledger                     # 最近交付�
 - 单文件 HTML；单文件交付时图片和 logo base64 内嵌
 - deck 用 deck 外壳，每方向出 2 页代表页（`references/modules/deck.md`）
 - App 原型的多屏不要只排成一排手机，展示板构图见 `references/app-prototype.md`「展示板」
-- 存项目目录 `design-demos/[方向名].html`，截图 `npx playwright screenshot file:///… out.png --viewport-size=1440,900`（deck 用 1920,1080）
+- 缩略图存 `design-demos/thumbs.html`，三个完整版存 `design-demos/dir-1.html`、`dir-2.html`、`dir-3.html`（deck 是 `dir-1/` 等子目录），截图 `npx playwright screenshot file:///… out.png --viewport-size=1440,900`（deck 用 1920,1080）
 
 三版都做完后跑：
 

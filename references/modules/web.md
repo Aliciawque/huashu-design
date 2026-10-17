@@ -36,7 +36,7 @@ React＋Babel 的写法与三条技术红线（样式对象必须唯一命名、
 
 | 要做什么 | 读 |
 |---|---|
-| 风格灵感（方向 C 轮盘的网页分区） | `references/design-styles.md` |
+| 风格库与样张（秒数轮盘的网页分区，外加跨媒介的中文与东亚分区） | `references/design-styles.md` |
 | 字体配对与中文排印 | `references/typography.md` |
 | 用户有 codebase / design system | `references/design-context.md` |
 | 交付前验证 | `references/verification.md` |

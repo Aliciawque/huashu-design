@@ -24,7 +24,7 @@
 
 > ⚠️ **以下所有风格条目里的 hex 是示例锚点，不是配方。** 同一风格用于不同内容，应通过本协议推导出不同色值——直接复制条目 hex，只是在生产品味更好的 slop。为什么：写死配方让 100 个用户拿到 100 份同色产出，色彩的信息量归零；推导让色彩成为「这个内容独有」的证据。
 >
-> **字体同理**：条目里的字体名也是示例锚点。选定风格后，display+body 配对先过 `references/typography.md` 的配对逻辑与「已被用烂名单」——**名单与条目冲突时以 typography.md 为准**（如条目写 Fraunces，按名单换平替；也注意名单里「高反差衬线 × 暖奶油底」这个组合本身就是默认外观）。
+> **字体同理**：条目里的字体名也是示例锚点。选定风格后，display+body 配对先过 `references/typography.md` 的配对逻辑与「已被用烂名单」——**名单与条目冲突时以 typography.md 为准**（如条目写 Fraunces，按名单换平替）。
 
 ### 三步法：采样 → 收敛 → 论证
 
@@ -159,7 +159,7 @@
 - 适配:AI产品站、品牌官网、长文阅读页、橙皮书电子书、调研报告、培训材料
 - 视觉DNA:配色奶油纸底#F5F0E8+赤陶橙#CC785C/#D97757点缀+近黑文字#191919，温暖低饱和。字体衬线标题（Tiempos感）×无衬线正文（Styrene感）混排。布局书籍式单栏阅读流、舒适行高、节制分隔线。标志元素：纸感暖底、赤陶橙、出版级排印节奏。
 - HTML实现:纯CSS 100%还原，零素材。背景色变量+衬线无衬线字体栈混排+max-width限制阅读宽度+line-height 1.7舒适行高。
-- ⚠️ 这一条就是 2026 年 AI 生成页面的头号默认外观（Claude 自己的配色，见 `references/content-guidelines.md`）。只在品牌本身如此、或用户明确要这个样子时用；轮盘抽到它而品牌不是这样，顺延下一号。
+- 注意：这也是模型最容易不假思索落下的外观（Claude 自己的配色，见 `references/content-guidelines.md`）。用它没问题，前提是选了它而不是滑进它：三个方向别都挤在这里，外观账本里最近用过就换一个。
 - 字体:Fraunces / Newsreader（替Tiempos衬线）+ Inter（替Styrene）
 - 样张:assets/style-specimens/web/12-warm-editorial.jpg
 
@@ -589,7 +589,7 @@
 - 视觉DNA:配色近黑#0B0B0B屏幕+信号橙#FF5A1F+米灰白#E9E9E4按键，浅灰#D8D8D4底板配细网格线。字体点阵/等宽，数字像液晶读数，标签像丝印（全大写+宽字距）。布局严格的方格网格，4×4按键阵列、圆形旋钮带单色指针、推子带橙色刻线；按键用「压下去的厚度」(inset 4px底边阴影)表达物理感。标志元素：点阵大字读数、方形按键、丝印小标签、一屏只有橙色一种强调色。
 - HTML实现:CSS Grid做按键阵列+aspect-ratio:1；旋钮用radial-gradient+伪元素指针rotate；推子用绝对定位的横条；点阵字体用Doto，缺省退回Space Mono；展示板背景用repeating网格线模拟面板。注意橙色只给「当前激活」，别满屏刷。
 - 字体:Doto（点阵读数）+ Space Mono（标签），中文标签用Noto Sans SC
-- 样张:assets/style-specimens/app/03-hardware-panel.jpg
+- 样张:assets/style-specimens/app/01-hardware-panel.jpg
 
 **液态玻璃 Liquid Glass（Apple iOS 26 新设计语言）** `大胆·还原70%`
 - 参考:Apple Liquid Glass，WWDC 2025发布，随iOS 26 / macOS Tahoe 26等同步推出；Apple称之为一种会折射周围内容、随触控动态响应的半透明材质，用于控件、导航、图标与小组件
@@ -597,7 +597,7 @@
 - 视觉DNA:配色由背景内容本身决定——高饱和渐变底（珊瑚橙→洋红→靛蓝，或青绿→薄荷），控件是半透明白色玻璃。字体系统无衬线，大数字紧字距。布局内容铺满全屏，控件（返回键、标签栏、底部面板）作为圆角胶囊/大圆角面板「浮」在内容上，标签栏是悬浮胶囊而不是贴底整条。标志元素：白色渐变高光描边、顶部内高光、背景模糊+饱和度提升、圆形/胶囊形控件。
 - HTML实现:backdrop-filter:blur(22px) saturate(180%)+半透明白渐变背景+1px白描边+inset高光阴影，是核心；背景必须是有色彩层次的渐变，玻璃才看得出来，纯色底上玻璃等于灰块。折射与镜面光效CSS做不到，只能降级为高光描边，要在产出里说明。
 - 字体:Inter（替SF Pro）+ Noto Sans SC
-- 样张:assets/style-specimens/app/04-liquid-glass.jpg
+- 样张:assets/style-specimens/app/02-liquid-glass.jpg
 
 **玩味3D材质 Playful Tactile（Not Boring系列式，Andy Works）** `大胆·还原70%`
 - 参考:(Not Boring)系列App（Andy Works，创始人Andy Allen与Mark Dawson；含Weather、Calculator、Timer、Habits），(Not Boring) Habits获2022 Apple Design Award；特点是饱和配色、触感反馈与3D动画，把平淡的工具做成「大胆、张扬」的体验
@@ -605,7 +605,7 @@
 - 视觉DNA:每屏一个满版饱和主色（橙#FF7A2D、薰衣草#B6A2FF、酸绿#D4FF3F），搭配近黑#1B1330文字。字体粗圆的大号数字，紧字距。布局一屏一个主角（一个巨大的表盘/温度管/开关），其余元素围着它；卡片轻微旋转，屏幕之间错落旋转。标志元素：有厚度的按钮（底边实色硬阴影）、带高光的凸起表盘、会「按下去」的开关。
 - HTML实现:多层box-shadow叠出厚度（实色下沿+内高光+外软阴影），radial-gradient做球面高光，rotate做错落。静态图只能呈现材质；触感反馈与动效在HTML里仅写transition，诚实标注。
 - 字体:Bricolage Grotesque（800）+ Noto Sans SC（900）
-- 样张:assets/style-specimens/app/05-playful-3d.jpg
+- 样张:assets/style-specimens/app/03-playful-3d.jpg
 
 **友好金融 Friendly Fintech（Monzo式，高饱和品牌色+大圆角）** `大胆·还原90%`
 - 参考:Monzo（品牌主色Hot Coral约#FF4F40，来自标志性的半透明珊瑚色银行卡；搭配深海军蓝#091723～#14233C，圆润的人文无衬线，胶囊形按钮，口语化文案）
@@ -613,7 +613,7 @@
 - 视觉DNA:配色珊瑚红#FF4F40大面积铺顶部+白色圆角底面板，罐子/分类用粉彩色块（黄#FFD66B、蓝#9AD8FF、绿#C8F0CE、粉#F9B9E8、紫#D8CBFF）。字体圆润的几何/人文无衬线，余额用58px以上粗体。布局顶部彩色区放余额与三个胶囊动作，下方白色面板像抽屉抬起；预算是2列大圆角方块「罐子」。标志元素：满版品牌色、34px以上大圆角、胶囊按钮、首字母/色块图标、口语化小标题（「钱去了哪里」）。
 - HTML实现:纯CSS即可1:1还原。border-radius:28~34px，grid两列，色块用纯色，进度条双层div。图标不画具体图形，用单字+同色系深浅底色。
 - 字体:Figtree（替Monzo自家MonzoSans）+ Noto Sans SC
-- 样张:assets/style-specimens/app/08-friendly-fintech.jpg
+- 样张:assets/style-specimens/app/04-friendly-fintech.jpg
 
 **专业相机工具 Pro Camera（Halide式，深色+黄色强调+密集刻度）** `大胆·还原85%`
 - 参考:Halide（Lux Optics，获Apple Design Award；界面为一只手操作而设计、受专业相机机身控件启发；自定义字体Ambrotype模仿胶片相机机身上的蚀刻文字；提供直方图、波形、彩色斑马纹（高光溢出提示）、对焦峰值等专业视图）
@@ -621,7 +621,7 @@
 - 视觉DNA:配色纯黑#000底+亮黄#FFCC00强调（只给「当前选中的参数」和中心刻度线）+灰白#EDEDED读数。黄色为本风格的取向，非对Halide配色的断言。字体等宽数字，参数标签小而宽字距。布局上半取景，下半固定为「参数行（快门/感光度/曝光/白平衡）+横向刻度尺+快门键」；刻度尺两端渐隐，中心一条黄线。标志元素：密集刻度尺、斑马纹高光提示、半透明直方图、一屏只有一个黄色焦点。
 - HTML实现:repeating-linear-gradient画刻度（短刻2px/14px，长刻2px/70px双层），mask-image做两端渐隐；斑马纹用repeating-linear-gradient 135deg；取景区用渐变占位+「照片位」。黄色别超过三处。
 - 字体:JetBrains Mono（数字与刻度）+ Noto Sans SC（标签）
-- 样张:assets/style-specimens/app/12-pro-camera.jpg
+- 样张:assets/style-specimens/app/05-pro-camera.jpg
 
 #### 中性派
 
@@ -631,7 +631,7 @@
 - 视觉DNA:配色羊皮纸米#EFEBDA底+等高线棕#C09A68（每五条加粗为计曲线）+林地浅绿#D8E4C4+水体浅蓝#BFDDE6，轨迹用高对比橙红#E4572E外加白色描边。字体窄体数字（大号读数）+中文无衬线。布局地图铺满，底部一块白色面板放里程/爬升/用时三个大数字和海拔剖面；列表页每张卡带一个迷你等高线缩略图+难度色标（黄/绿/红）。标志元素：等高线、带白描边的轨迹线、海拔剖面面积图、难度色标。
 - HTML实现:SVG path画等高线（嵌套的不规则闭合曲线，计曲线stroke更粗），轨迹两层path（白粗线叠橙细线）；展示板背景延续同一套等高线。等高线必须是不规则曲线，正圆/椭圆同心一眼假。
 - 字体:Barlow Condensed（读数）+ Noto Sans SC
-- 样张:assets/style-specimens/app/07-topo-outdoor.jpg
+- 样张:assets/style-specimens/app/06-topo-outdoor.jpg
 
 **中文内容瀑布流 Feed Waterfall（小红书式双列卡片流）** `中性·还原92%`
 - 参考:小红书首页「发现」双列瀑布流（卡片按真实比例错落排列，图在上、标题两行、作者与点赞在下，顶部频道标签，底部导航中间是红色加号）
@@ -639,7 +639,7 @@
 - 视觉DNA:配色白卡片#FFF+浅灰底#F5F5F7，品牌红#FF2442只用于选中下划线、加号按钮、关注、点赞态。字体系统中文无衬线，标题15px/两行截断。布局双列、列间距6px、卡片圆角10px，封面比例各不相同（约1:1到3:4）形成错落；卡片底部固定一行作者头像+昵称+点赞数。标志元素：错落的封面高度、两行标题、头像+昵称+点赞行、红色加号。
 - HTML实现:flex两列，每列flex-direction:column，卡片flex:none，封面用不同height的渐变占位并标「照片位」；标题用-webkit-line-clamp:2；头像用首字母圆点，不画人像。
 - 字体:Noto Sans SC
-- 样张:assets/style-specimens/app/09-feed-waterfall.jpg
+- 样张:assets/style-specimens/app/07-feed-waterfall.jpg
 
 **键盘优先命令面板 Command Palette（Raycast式）** `中性·还原90%`
 - 参考:Raycast（近黑底约#07080A、1px发丝边框约#242728、Inter正文加等宽键帽；以色块小图标标识命令，右侧对齐快捷键；用色阶层次而不是阴影区分层级）
@@ -647,7 +647,7 @@
 - 视觉DNA:配色近黑#07080A画布+面板#121315+选中行#202225，命令图标用饱和小色块（红#FF6363、蓝#52A9FF、绿#59D499、紫#8A63F5、黄#FFC531）。字体Inter正文+等宽键帽/日志。布局顶部一行输入框（光标用红色竖线），下面按「建议/命令」分组的单行列表，每行：小色块图标+名称+灰色副标题+右对齐键帽；底部固定一条操作栏（「打开命令 ↵」「更多操作 ⌘K」）。标志元素：渐变键帽、分组小标题、选中行浅灰高亮、底部操作栏。Raycast本体是桌面端，样张用「桌面面板局部+手机适配」的方式呈现。
 - HTML实现:flex行+border发丝线；键帽用渐变背景+border-bottom颜色更深+0 2px 0阴影；整体不用大阴影，只用外层一次深色投影。
 - 字体:Inter + JetBrains Mono（键帽与日志）+ Noto Sans SC
-- 样张:assets/style-specimens/app/10-command-palette.jpg
+- 样张:assets/style-specimens/app/08-command-palette.jpg
 
 **健康数据颜色编码 Health Color-Code（Apple 健康 / Oura式）** `中性·还原92%`
 - 参考:Apple 健康/活动圆环（黑底上红、绿、蓝三色同心圆环，分别对应活动、锻炼、站立）；Oura（Readiness/Sleep/Activity三个0–100分，蓝色表示达标，黄色表示一般，红色表示需关注）
@@ -655,7 +655,7 @@
 - 视觉DNA:配色纯黑#000底+卡片#1C1C1E，状态语义色（蓝#3498FF最佳、黄#FFCC00一般、红#FF453A注意），圆环色（#FA114F、#92E82A、#1EEAEF）。字体粗体大分数（76px以上）+小号灰色标签。布局顶部一个大圆环/大分数当主角，下面是卡片：构成项条形、睡眠分期柱、正常范围色带上的趋势线；每个数据旁一个小状态胶囊（良好/偏低/偏多）。标志元素：圆环进度、状态胶囊、「正常范围」半透明色带、颜色即结论。
 - HTML实现:SVG circle+stroke-dasharray做圆环（轨道同色低亮度），条形用双层div，范围色带是半透明rect；状态胶囊=半透明底+同色文字。一屏里状态色与圆环色分开使用，别混成一团彩虹。
 - 字体:Inter + Noto Sans SC
-- 样张:assets/style-specimens/app/11-health-color-code.jpg
+- 样张:assets/style-specimens/app/09-health-color-code.jpg
 
 #### 安静派
 
@@ -665,7 +665,7 @@
 - 视觉DNA:配色纯白#FFF+近黑文字#1D1D1F+一个蓝#3478F6（只给勾选、链接、加号按钮），黄色星标#F6C21B给「今天」，灰#8A8F9B给次要信息。字体系统无衬线，大标题32px粗体紧字距。布局列表为主，行间一条缩进的发丝线（从复选框右侧起），分组标题用小号粗体+下划线；任务展开成带大阴影的浮起卡片，里面是备注、清单、标签与截止日期。标志元素：圆角方形复选框、缩进发丝线、「今晚」月亮分区、浮起任务卡、蓝色圆形加号。
 - HTML实现:纯CSS即可还原。复选框用border:2px+border-radius:7px，完成态灰填充+伪元素勾；行分隔线用:after左缩进；任务卡片双层阴影（0 2px 6px+0 26px 60px）。动效（展开、勾选）在静态图里体现不了，只做结构。
 - 字体:Inter（iOS风格可降级为系统栈）+ Noto Sans SC
-- 样张:assets/style-specimens/app/01-native-polish.jpg
+- 样张:assets/style-specimens/app/10-native-polish.jpg
 
 **柔和鼓励式 Gentle Encouragement（Gentler Streak式，暗色变体）** `安静·还原80%`
 - 参考:Gentler Streak（Gentler Stories，斯洛文尼亚；2024 Apple Design Award「社会影响」类别得主；强调个人进步而非与他人比较，核心视觉是「Activity Path」——把当天状态表示为从「休息」到「活跃」的区间；色调为柔和的蓝绿）。注：官方描述的主界面偏明亮通透，本条目的深夜蓝底为在其柔和蓝绿、圆润、不评判基调上做的暗色变体
@@ -673,7 +673,7 @@
 - 视觉DNA:配色深夜蓝渐变#18213A→#202C4A，卡片#26335A，强调色柔和薄荷#9BE0CC、薰衣草#BAC3FA、蜜桃#F4D0A8（三个都是低饱和粉彩）。字体圆润无衬线，大标题用「今天适合……」这类建议句，不用「已完成X%」。布局全是28px大圆角卡片竖向堆叠；核心卡片是一条圆头的渐变曲线路径+一个白色定位点；月度视图用圆点日历，休息日用蜜桃色，不断档。标志元素：圆头曲线路径、粉彩状态胶囊、圆点月历、「没有断档，休息也是计划的一部分」式文案。
 - HTML实现:SVG path做路径（底轨深色+上层渐变描边stroke-dasharray截断），圆点日历用grid+border-radius:50%。关键在文案语气：全程陈述与建议，没有红色、没有感叹号、没有排名。
 - 字体:Nunito（圆润）+ Noto Sans SC
-- 样张:assets/style-specimens/app/02-gentle-encouraging.jpg
+- 样张:assets/style-specimens/app/11-gentle-encouraging.jpg
 
 **编辑式阅读 Editorial Reader（Matter / Readwise Reader式）** `安静·还原90%`
 - 参考:Matter（提供约10款阅读字体，含New York、Valkyrie、Lyon、Literata，多套主题；队列首页间距与字号克制；长按拖动即可高亮）；Readwise Reader（双击段落高亮，高亮与笔记同步）
@@ -681,7 +681,7 @@
 - 视觉DNA:配色暖纸白#FBF8F1+墨黑#26221C+一个赭红#B5532A（来源名、进度条、设置值），高亮用荧光黄#F4D35E。字体衬线正文（18px/行高1.85），UI标签用小号无衬线+宽字距。布局待读队列是纯文字条目——来源/时长、衬线标题、两行摘要、一条细进度线，不放缩略图；阅读页是窄栏居中正文，选中文字后浮出深色小工具条（高亮/笔记/复制）；高亮可以单独放大成一张带笔记的卡片。标志元素：衬线标题、荧光笔下划线式高亮、深色选择工具条、细进度线。
 - HTML实现:mark用linear-gradient(transparent 12%, 黄 12%, 黄 92%, transparent 92%)模拟荧光笔，比纯背景色更像手划；工具条white-space:nowrap防止中文竖排换行；衬线中文用Noto Serif SC。
 - 字体:Literata + Noto Serif SC（正文），Inter（标签）
-- 样张:assets/style-specimens/app/06-editorial-reader.jpg
+- 样张:assets/style-specimens/app/12-editorial-reader.jpg
 
 ---
 
@@ -689,7 +689,7 @@
 
 > 2026-10 新增。跨媒介分区：网页、deck、海报、封面、信息图都能用，每条的「适配」写了适合什么。秒数轮盘每次除了在产出形态对应的分区抽一号，也在这里抽一号。中文内容尤其值得来翻：西方参考做中文版面，常常只剩配色。
 
-> 这个分区的前提：中文版面有自己的语法——竖排、版心、界栏、题签、汉字结构——不是「西方风格 + 换成中文字体」。用法与其他分区相同：七成力度、先走色彩推导协议。
+> 这个分区的前提：中文版面有自己的语法——竖排、版心、界栏、题签、汉字结构——不是「西方风格 + 换成中文字体」。用法与其他分区相同：先看样张、先走色彩推导协议。
 > 还原度说明：手写题签、做旧纸张、真实照片、铅字/刻本的肌理，纯 HTML/CSS 做不到，都按诚实降级处理，并在各条「HTML实现」里写明。
 > 事实核实：设计师与作品只写查到来源的；各条「视觉DNA」是对这一风格版式语言的归纳，不是对某一页的逐像素描述。
 
@@ -710,7 +710,7 @@
 - 样张:assets/style-specimens/east/02-song-block-print.jpg
 
 **民国书衣 Republic-Era Book Jacket** `中性·还原70%`
-- 参考:鲁迅与陶元庆一代的书刊封面。陶元庆为鲁迅设计过《彷徨》（1926）《坟》《朝花夕拾》《唐宋传奇集》等；鲁迅自己也设计封面，《呐喊》1926 年第四版以隶书题写书名并夸大三个「口」字，他的封面大多以文字为主，简洁淡雅。
+- 参考:鲁迅与陶元庆一代的书刊封面。陶元庆为鲁迅设计过《彷徨》（1926）《坟》《朝花夕拾》《唐宋传奇集》等；鲁迅自己也设计封面（如《呐喊》），大多以文字为主，简洁淡雅。
 - 适配:书封与书籍平铺图、专辑/剧本集/游记类封面、文化类 landing 的首屏、展览海报、文创包装
 - 视觉DNA:低饱和土黄/灰绿纸色底，墨黑+一点朱红共三色；**白色题签条**贴在封面上，书名竖排；外加细双线边框；图案是平涂的几何化图形（山、日、水纹），不写实、有排线；大面积留白；封面、书脊、封底平铺展开。
 - HTML实现:flex 排封底/书脊/封面三栏，双线框用 border+伪元素，题签条是带细框的浅色块；图案用 SVG 几何多边形与线。**手写题签做不到**，降级为 LXGW WenKai（手写楷）；纸张做旧、烫印、套色错位做不到，降级为平涂纸色。
@@ -758,7 +758,7 @@
 - 样张:assets/style-specimens/east/08-sugiura-info-mandala.jpg
 
 **田中一光几何平面构成 Ikko Tanaka Geometric** `中性·还原90%`
-- 参考:田中一光（1930–2002）。把日本传统与国际主义风格融合，《日本舞踊》海报（1981，用方块与矩形在网格上构成艺伎的发髻与脸）是代表作；1973 年起任西武集团创意总监，1980 年起任无印良品艺术总监；风格受琳派影响。
+- 参考:田中一光（1930–2002）。把日本传统与国际主义风格融合，《日本舞踊》海报（1981，用方块与矩形在网格上构成艺伎的发髻与脸）是代表作；1973 年起为西武剧场做海报、1975 年起任西武集团创意总监，1980 年起参与创立无印良品并长期主导其视觉；风格受琳派影响。
 - 适配:展览/影展/演出海报、品牌宣言页、deck 封面、文化机构网页首屏
 - 视觉DNA:**网格上的方、圆、四分之一圆**拼成一个抽象主图，红 #D9381E / 黑 / 芥黄 / 一点钢蓝，在米纸色底上；竖排粗宋体大标题；右侧信息按「会期 / 会场 / 主题 / 票价」小红标签分块；底部一条细黑线。扇形、圆日、条纹（幕）是传统母题的几何转译。
 - HTML实现:一个 560px 方阵，70px 为单位，用 border-radius 做四分之一圆和半圆；条纹用 repeating-linear-gradient。丝网印刷的套色与纸面颗粒做不到，降级为纯色平涂。
