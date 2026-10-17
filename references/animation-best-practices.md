@@ -517,4 +517,4 @@ stage.style.transform = `
 - Anthropic 音频拆解：同目录 `AUDIO-BEST-PRACTICES.md`
 - 3 支参考视频：`ref-{1,2,3}.mp4` + 对应 `gemini-ref-*.md` / `audio-ref-*.md`
 - **严格过滤**：本 reference 不收录任何具体品牌色值、字体名、产品名。
-  色彩/字体决策走品牌资产协议或三方向的想法卡。
+  色彩/字体决策走品牌资产协议或三方向的方向卡。

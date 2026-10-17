@@ -439,7 +439,7 @@ def cmd_compare(a):
     if len(claude) >= 2 and not a.brand:
         print(f'  🟡 {len(claude)} 版都落在 Claude 家族外观（暖奶油＋衬线/陶土色）：{claude}——最多留一版')
         bad += 1
-    print('  ✓ 三版拉开了' if not bad else '  → 撞了的那版回到想法卡重做：换信息组织方式或换参照池，不是换颜色')
+    print('  ✓ 三版拉开了' if not bad else '  → 撞了的那版回到方向卡重做：换骨架或换来源，不是换颜色')
     return 1 if bad else 0
 
 

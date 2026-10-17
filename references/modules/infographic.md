@@ -17,7 +17,7 @@
 
 ## 做的顺序
 
-1. 三方向：每方向 1 个完整 HTML，按目标宽度截整页长图（`references/directions.md`）。三张想法卡的信息组织方式要不同：地图、时间轴、图鉴、单一巨物、叙事序列……
+1. 三方向：每方向 1 个完整 HTML，按目标宽度截整页长图（`references/directions.md`）。三版骨架要不同（地图、时间轴、图鉴、单一巨物、叙事序列都是可选的结构），但别为了不同硬套隐喻。
 2. 选定后填全内容、校对每个数字和单位
 3. 导出：`npx playwright screenshot --full-page --viewport-size=1080,1350 file:///… out.png`；要发平台的按平台规格再切
 

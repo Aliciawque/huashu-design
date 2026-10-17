@@ -138,7 +138,7 @@ def harvest(project: Path):
                   approved.read_text(encoding='utf-8').strip()[:3000]]
     directions = project / 'directions.md'
     if directions.exists():
-        lines += ['', f'directions.md 在：{directions}（三个想法卡，对照他的选择看他偏向哪种想法而不只是哪种颜色）']
+        lines += ['', f'directions.md 在：{directions}（三张方向卡，对照他的选择看他偏向哪套逻辑、哪种力度，而不只是哪种颜色）']
     demos = sorted((project / 'design-demos').glob('*.html')) if (project / 'design-demos').is_dir() else []
     if demos:
         lines.append(f'design-demos：{len(demos)} 个方向初稿')

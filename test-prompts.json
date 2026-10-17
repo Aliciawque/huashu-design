@@ -2,8 +2,8 @@
   {
     "id": 1,
     "prompt": "我想做一个SaaS产品的登录页面，给我3个风格方向对比看看",
-    "expected": "先跑开工三件事（learn / ledger / capabilities）；只问一轮问题并索要参考；写三张想法卡（信息组织方式各不相同、参照来自三个池子）；三个方向各出一版真实 HTML＋截图，design_lint compare 不撞、不落在 Claude 家族外观；摆出来就停",
-    "tests": "三方向门 + 想法卡 + 2026 年 AI 默认外观避让 + compare 自检"
+    "expected": "先跑开工三件事（learn / ledger / capabilities）；只问一轮问题并索要参考；写三张方向卡（最佳设计师 / 现实参照 / 秒数轮盘），过三道护栏（最多一版默认家族、不撞外观账本、最多一版用力过头）；三版各出真实 HTML＋截图，design_lint compare 不撞；摆出来就停",
+    "tests": "三方向门 + 方向卡与护栏 + 2026 年 AI 默认外观避让 + compare 自检"
   },
   {
     "id": 2,
