@@ -1,8 +1,22 @@
 # Content Guidelines：反AI slop、内容准则、Scale规范
 
-AI设计里最容易掉进去的陷阱。这是一份「不做什么」的清单，比「做什么」更重要——因为AI slop是默认值，你不主动避免就会发生。
+AI slop 是默认值，不主动避开就会发生。但「默认值」会随时间变：2024 年是紫渐变和 emoji，2026 年变成了更「有品位」的样子。只禁上一代的 slop，等于在打上一场仗。
 
-## AI Slop 完整黑名单
+## 2026 年的 AI 默认外观（先读这个）
+
+Anthropic 官方 frontend-design skill（2026）把当下 AI 生成页面的聚类写得很清楚（[原文](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md)）：
+
+1. **暖奶油底（接近 #F4F1EA）＋高反差衬线标题＋陶土色点缀（接近 #D97757）**。这是 Claude 自己的交互配色，也是你——模型——最容易滑进去的地方。出现在用户的 brief 上，它读起来就是「AI 做的」。
+2. **近黑底＋单一亮色点缀**（酸绿或朱红）。
+3. **报纸式版面**：细线分栏、零圆角、密集的报纸栏。
+4. **SaaS 卡片套件**：内容切成一样的圆角卡片，所有东西同一个圆角、同一层浅灰阴影，渐变当装饰。
+5. **模板装饰**：每个标题上面一行拉开字距的全大写小标签；用中点连成的「A · B · C」；「WORD — 片段」式标签；用 #0B0B0B、#111 代替黑；等宽字体做小数据标签；链接和按钮后面加「→」。
+
+还有三个排版上的默认动作：标题里只给一个词换色或换斜体；所有小标签全大写；内容上方加不必要的小标签。编号（01 / 02 / 03）只在内容真是序列时才用。
+
+**这些都不是禁令**——某些 brief 就该这样，brief 明说要这种样子就照做。问题是它们出现时往往不是选择而是默认，和题材无关地出现。所以：brief 没锁定的维度，别把自由花在这些默认上。`scripts/design_lint.py check` 会把命中的特征列成黄灯，命中了要么改，要么在交付说明里写一句为什么这里是选择。
+
+## 上一代 slop（2024 年前后，仍然要避开）
 
 ### 视觉陷阱
 
@@ -83,14 +97,14 @@ AI设计里最容易掉进去的陷阱。这是一份「不做什么」的清单
 **✅ 策略**：
 1. 有品牌色 → 用品牌色，缺的color token用oklch插值
 2. 没有品牌色但有参考 → 从参考产品截图吸色
-3. 完全从零 → 选一个known的配色系统（Radix Colors / Tailwind默认palette / Anthropic brand），不要自己调
+3. 完全从零 → 从题材里采色（它的材料、产地、器物、真图里的主导色），按 `references/design-styles.md` 的「色彩推导协议」采样→收敛→论证。**不要拿 Anthropic / Claude 的品牌色当「安全默认」**——那正是 2026 年 AI 默认外观的第一条
 
 **oklch定义色彩**是最现代的做法：
 ```css
 :root {
-  --primary: oklch(0.65 0.18 25);      /* 温暖的terracotta */
-  --primary-light: oklch(0.85 0.08 25); /* 同色系浅色 */
-  --primary-dark: oklch(0.45 0.20 25);  /* 同色系深色 */
+  --primary: oklch(0.62 0.14 155);      /* 示例：从题材真图里采到的苔绿，色值随内容变 */
+  --primary-light: oklch(0.85 0.06 155); /* 同色系浅色 */
+  --primary-dark: oklch(0.42 0.15 155);  /* 同色系深色 */
 }
 ```
 oklch能保证调整亮度时色相不漂移，比hsl好用。
@@ -108,6 +122,15 @@ oklch能保证调整亮度时色相不漂移，比hsl好用。
 
 **❌ Card grid里每个card长一样**
 Asymmetric、不同大小的cards、有的带image有的只有文字、有的跨列——这才像真设计师做的。
+
+## 正向做什么
+
+- **胆量只花在一处**：让一个元素成为被记住的那个，周围安静克制。品味是在合适的地方足够精致，不是均匀用力——一个细节做到 120%，其余 80%。出门前照镜子，摘掉一件配饰。
+- **结构件要承载信息**：边框、编号、分隔线、小标签是在编码内容关系，不是装饰。加之前问它说了什么。
+- 排版细节是「品味税」：`text-wrap: pretty`、CSS Grid、`oklch()`；中文用「」引号（`references/typography.md`）。
+- 不凭空发明颜色：品牌资产里吸色、内容真图里采色、题材的文化语境里取色（`references/design-styles.md` 色彩推导协议）。
+
+**反例要看得出是反例**：任务本身要展示反设计（讲「什么是 AI slop」、做对比评测）时，别整页堆 slop，用诚实的反例容器隔离——虚线边框加「反例 · 不要这样做」角标，让反例服务叙事，不污染页面主调。
 
 ## 内容准则
 
@@ -137,8 +160,8 @@ Asymmetric、不同大小的cards、有的带image有的只有文字、有的跨
 
 ```markdown
 我的设计系统：
-- 色彩：#1A1A1A主体 + #F0EEE6背景 + #D97757 accent（来自你的品牌）
-- 字型：Instrument Serif做display + Geist Sans做body
+- 色彩：#14261F主体 + #E6EDE4背景 + #C8553D accent（背景和主体取自你产品图里的苔绿，accent 取自 logo）
+- 字型：Schibsted Grotesk做display + Source Serif 4做body
 - 节奏：section title用full-bleed彩色背景 + 白字；普通section用白背景
 - 图像：hero用full-bleed照片，feature section用placeholder等你提供
 - 最多用2种背景色，避免杂乱

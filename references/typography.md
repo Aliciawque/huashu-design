@@ -113,6 +113,7 @@ balance 只用于 ≤4 行的标题（算法限制 6 行且有性能成本）；
 | Inter 当 display | Inter 是为 UI 小字设计的，大字号下匀质无表情 | Archivo、Anton、Schibsted Grotesk |
 | Space Grotesk | 「科技感」的偷懒答案，泛滥于加密/AI 落地页 | Schibsted Grotesk、Familjen Grotesk |
 | Playfair Display | 「优雅」的偷懒答案，婚礼请柬既视感 | Cormorant（更极端）、DM Serif Display（更憨） |
+| 高反差衬线 display × 暖奶油底（不论哪款衬线） | 2026 年 AI 页面头号聚类：问题在组合不在字体，Newsreader 放在暖奶油底上和 Fraunces 一样是自曝 | 衬线放到有色底、深底或照片上；或者换成 grotesque / 宽体 / 等宽当 display |
 
 ## 4. 中文排印（本文最重的一章）
 
@@ -142,8 +143,8 @@ balance 只用于 ≤4 行的标题（算法限制 6 行且有性能成本）；
 ```css
 /* 西文在前，中文在后，系统中文兜底，泛型收尾 */
 font-family: "Geist", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
-/* 衬线同理 */
-font-family: "Newsreader", "Noto Serif SC", "Songti SC", serif;
+/* 衬线同理（字体名只是示例，按配对表和题材选） */
+font-family: "Source Serif 4", "Noto Serif SC", "Songti SC", serif;
 ```
 
 为什么这个顺序：font-family 是逐字符匹配的，西文字体不含 CJK 码位，汉字自然穿透到中文字体。反过来写（中文在前）西文字符全被中文字体吃掉，等于白配。
@@ -225,7 +226,7 @@ font-family: "Newsreader", "Noto Serif SC", "Songti SC", serif;
 :root {
   /* 1. fallback 链：西文 → 中文 → 系统中文 → 泛型（顺序即规则，见 4.2） */
   --font-body: "Geist", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-display: "Newsreader", "Noto Serif SC", "Songti SC", serif;
+  --font-display: "<按配对表为这个题材选>", "Noto Serif SC", "Songti SC", serif;  /* 不要默认填一个衬线 */
 
   /* 2. 禁合成：不接受浏览器伪造的斜体/加粗（中文场景必开） */
   font-synthesis: none;
