@@ -58,6 +58,7 @@ class LintFacts(unittest.TestCase):
         self.assertEqual(dl.bg_class((0xF4, 0xF1, 0xEA)), '浅·暖纸')
         self.assertEqual(dl.bg_class((0xFA, 0xF8, 0xF4)), '浅·暖纸')
         self.assertEqual(dl.bg_class((0xFA, 0xFA, 0xFA)), '浅·中性白')
+        self.assertNotEqual(dl.bg_class((0xDF, 0xEB, 0xE5)), '浅·暖纸')   # 冷青瓷灰不是暖奶油
 
 
 class LintEdgeCases(unittest.TestCase):

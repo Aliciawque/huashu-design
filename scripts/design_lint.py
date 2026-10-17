@@ -313,7 +313,7 @@ def judge(f):
         red.append(f'对比度不够 {len(f["lowContrast"])} 处，如 {f["lowContrast"][:3]}')
 
     bg = f['bg'] if f['bg'] and f['bg'][3] > 0.5 else f['palette'][0]['rgb']
-    cream = dist(bg, CREAM) < 0.035 or bg_class(bg) == '浅·暖纸'
+    cream = bg_class(bg) == '浅·暖纸'   # 必须是暖色相：浅冷灰（如 #DFEBE5）数值上也离奶油色很近，但不是这一类
     clay = any(dist(c['rgb'], CLAY) < 0.07 for c in f['palette']) or \
         any(dist([int(x) for x in k.split(',')], CLAY) < 0.07 for k in f['textColors'])
     if cream and (clay or f['headlineSerif']):
