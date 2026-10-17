@@ -60,6 +60,7 @@ COLLECT_JS = r"""
     const c = rgba(cs.backgroundColor); return c[3] > 0.9 ? c : undefined;
   };
   const bgOf = (el) => {
+    const own = opaqueBg(el); if (own !== undefined) return own;   // 按钮、标签自带的底色先算
     const r = el.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2;
     if (x >= 0 && y >= 0 && x < innerWidth && y < innerHeight) {
       for (const e of document.elementsFromPoint(x, y)) {
