@@ -113,7 +113,7 @@ balance 只用于 ≤4 行的标题（算法限制 6 行且有性能成本）；
 | Inter 当 display | Inter 是为 UI 小字设计的，大字号下匀质无表情 | Archivo、Anton、Schibsted Grotesk |
 | Space Grotesk | 「科技感」的偷懒答案，泛滥于加密/AI 落地页 | Schibsted Grotesk、Familjen Grotesk |
 | Playfair Display | 「优雅」的偷懒答案，婚礼请柬既视感 | Cormorant（更极端）、DM Serif Display（更憨） |
-| 高反差衬线 display × 暖奶油底（不论哪款衬线） | 2026 年 AI 页面头号聚类：问题在组合不在字体，Newsreader 放在暖奶油底上和 Fraunces 一样是自曝 | 衬线放到有色底、深底或照片上；或者换成 grotesque / 宽体 / 等宽当 display |
+| 高反差衬线 display × 暖奶油底（不论哪款衬线） | 2026 年 AI 页面聚类的第一类：问题在组合不在字体，Newsreader 放在暖奶油底上和 Fraunces 一样是自曝 | 衬线放到有色底、深底或照片上；或者换成 grotesque / 宽体 / 等宽当 display |
 
 ## 4. 中文排印（本文最重的一章）
 

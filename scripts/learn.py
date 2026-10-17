@@ -14,6 +14,7 @@ learn.py — 让 huashu-design 每做一个项目就更懂这个用户一点。
           --topics deck,color --evidence "原话/项目/文件/测量" [--do "下次怎么做"] [--project 名]
   python3 scripts/learn.py harvest <项目目录>   收工后：列出项目里能当证据的东西，以及该不该记的判据
   python3 scripts/learn.py status
+  python3 scripts/learn.py -- status            主题词恰好叫 add/harvest/status 时，用 -- 隔开
 
 移植自 huashu-motion 的 `om learn`（同一作者，MIT），去掉了对 studio 评论的依赖。
 """
@@ -64,7 +65,7 @@ def entries(path: Path, layer: str):
         if not block.startswith('## '):
             continue
         head = block.split('\n', 1)[0][3:].strip()
-        m = re.search(r'·\s*(preference|observed|verified|superseded)\s*·', head)
+        m = re.search(r'·\s*(preference|observed|verified|superseded)\b', head)   # 手改时漏了结尾的「·」也认
         kind = m.group(1) if m else ('shipped' if layer == 'shipped' else 'observed')
         t = re.search(r'topics?:\s*([^\n·]+)', head, re.I)
         tags = [x for x in re.split(r'[,，\s]+', t.group(1) if t else '') if x]
@@ -169,9 +170,16 @@ def status():
 
 
 def main(argv=None):
+    for stream in (sys.stdout, sys.stderr):   # Windows 控制台默认不是 UTF-8
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
-        if argv and argv[0] == 'add':
+        if argv and argv[0] == '--':
+            print(recall(argv[1:]))
+        elif argv and argv[0] == 'add':
             p = argparse.ArgumentParser(prog='learn.py add')
             p.add_argument('text')
             p.add_argument('--kind', required=True)

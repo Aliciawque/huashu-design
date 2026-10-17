@@ -19,6 +19,7 @@ design_lint.py — 只量事实的设计体检，外加「外观指纹」：三�
 """
 
 import argparse
+import glob
 import io
 import json
 import math
@@ -43,20 +44,37 @@ COLLECT_JS = r"""
     if (cache[s]) return cache[s];
     cx.clearRect(0, 0, 1, 1); cx.fillStyle = '#000'; cx.fillStyle = s; cx.fillRect(0, 0, 1, 1);
     const d = cx.getImageData(0, 0, 1, 1).data;
-    let a = 1; const m = /rgba?\([^)]*[,/]\s*([\d.]+%?)\s*\)/.exec(s) || /\/\s*([\d.]+%?)\s*\)/.exec(s);
-    if (m) a = m[1].endsWith('%') ? parseFloat(m[1]) / 100 : parseFloat(m[1]);
+    // alpha 只在「第四个分量」或「/ 后面」才有：rgb(187,187,187) 的最后一个数不是 alpha
+    let a = 1; const inner = (/\(([^)]*)\)/.exec(s) || [])[1] || '';
+    const parts = inner.split(/[\s,/]+/).filter(Boolean);
+    const raw = inner.includes('/') ? parts[parts.length - 1] : (/^(rgba|hsla)\(/.test(s) && parts.length === 4 ? parts[3] : null);
+    if (raw) a = raw.endsWith('%') ? parseFloat(raw) / 100 : parseFloat(raw);
     return (cache[s] = [d[0], d[1], d[2], a]);
   };
   const lum = ([r, g, b]) => { const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
   const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const opaqueBg = (e) => {   // 返回 [r,g,b,1]、null（图/渐变/画布，算不了）或 undefined（透明，继续往下找）
+    if (/^(IMG|VIDEO|CANVAS|PICTURE|IFRAME)$/.test(e.tagName) || e instanceof SVGElement) return null;
+    const cs = getComputedStyle(e);
+    if (cs.backgroundImage && cs.backgroundImage !== 'none') return null;
+    const c = rgba(cs.backgroundColor); return c[3] > 0.9 ? c : undefined;
+  };
   const bgOf = (el) => {
-    for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
-      const cs = getComputedStyle(e);
-      if (cs.backgroundImage && cs.backgroundImage !== 'none') return null; // 背景是图/渐变，对比度没法可靠算
-      const c = rgba(cs.backgroundColor); if (c[3] > 0.9) return c;
+    const r = el.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (x >= 0 && y >= 0 && x < innerWidth && y < innerHeight) {
+      for (const e of document.elementsFromPoint(x, y)) {
+        if (e === el || el.contains(e)) continue;
+        const b = opaqueBg(e); if (b !== undefined) return b;
+      }
+      return [255, 255, 255, 1];
     }
+    for (let e = el.parentElement; e && e.nodeType === 1; e = e.parentElement) { const b = opaqueBg(e); if (b !== undefined) return b; }
     return [255, 255, 255, 1];
   };
+  const opacityOf = (el) => { let o = 1; for (let e = el; e && e.nodeType === 1; e = e.parentElement) o *= parseFloat(getComputedStyle(e).opacity); return o; };
+  // SVG 里的字按渲染后的大小算（viewBox 会放大缩小）
+  const scaleOf = (el) => { if (!(el instanceof SVGElement) || !el.getScreenCTM) return 1; const m = el.getScreenCTM(); return m ? Math.hypot(m.a, m.b) || 1 : 1; };
+  const CAPTION = 'figcaption, footer, small, caption, aside, sup, sub, [class*=caption], [class*=credit], [class*=footnote], [class*=meta]';
   const visible = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
     return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && parseFloat(cs.opacity) > 0.05; };
   const ownText = (el) => Array.from(el.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
@@ -64,7 +82,8 @@ COLLECT_JS = r"""
 
   const out = { small: [], lowContrast: [], eyebrows: [], dots: 0, emDashLabels: 0, arrows: 0, numbered: [],
                 accentWord: [], cardKit: 0, hairlines: 0, radiusZero: 0, radiusTotal: 0, monoSmall: 0,
-                broken: [], fonts: {}, display: null, body: null, headlineSerif: false, textColors: {}, bg: null };
+                broken: [], fonts: {}, display: null, body: null, headlineSerif: false, textColors: {}, bg: null,
+                bodySmall: [], relImgs: [], textTotal: 0 };
 
   const all = Array.from(document.body ? document.body.querySelectorAll('*') : []);
   const cardSig = {};
@@ -73,15 +92,20 @@ COLLECT_JS = r"""
     if (!visible(el)) continue;
     const cs = getComputedStyle(el);
     const t = ownText(el);
-    const fs = parseFloat(cs.fontSize);
+    const fs = parseFloat(cs.fontSize) * scaleOf(el);
     if (t.length > 1) {
+      out.textTotal += t.length;
       if (fs > maxFs) { maxFs = fs; displayEl = el; }
       const f = fam(cs.fontFamily); out.fonts[f] = (out.fonts[f] || 0) + t.length;
       const col = rgba(cs.color); const key = col.slice(0, 3).join(',');
       out.textColors[key] = (out.textColors[key] || 0) + t.length * fs;
-      if (fs < 12) out.small.push({ text: t.slice(0, 30), px: fs });
+      if (fs < (window.__MIN_LABEL || 12)) out.small.push({ text: t.slice(0, 30), px: Math.round(fs) });
+      // 像正文的字：一段超过 28 字、又不是图注页脚，按正文下限算（不管它是 p、li 还是 div）
+      if (t.length >= 28 && !el.closest(CAPTION) && fs < (window.__MIN_BODY || 14)) out.bodySmall.push({ text: t.slice(0, 30), px: Math.round(fs) });
       const bg = bgOf(el);
-      if (bg) { const c = contrast(col, bg); const large = fs >= 24 || (fs >= 18.66 && parseInt(cs.fontWeight) >= 700);
+      if (bg) { const a = col[3] * opacityOf(el);   // 半透明的字先和底色混合再算对比度
+        const fg = [0, 1, 2].map((i) => col[i] * a + bg[i] * (1 - a));
+        const c = contrast(fg, bg); const large = fs >= 24 || (fs >= 18.66 && parseInt(cs.fontWeight) >= 700);
         if (c < (large ? 3 : 4.5)) out.lowContrast.push({ text: t.slice(0, 30), ratio: Math.round(c * 100) / 100, px: fs }); }
       const latin = t.replace(/[^A-Za-z]/g, '');
       const caps = cs.textTransform === 'uppercase' || (latin.length >= 3 && latin === latin.toUpperCase());
@@ -121,8 +145,11 @@ COLLECT_JS = r"""
     out.headlineSerif = !/sans/i.test(first) && /(^serif$|garamond|newsreader|serif|caslon|playfair|fraunces|cormorant|tiempos|lora|baskerville|didot|bodoni|georgia|times|songti|宋|明朝|mincho)/i.test(first); }
   const p = Array.from(document.querySelectorAll('p, li')).find((e) => visible(e) && e.textContent.trim().length > 20);
   if (p) { const cs = getComputedStyle(p); out.body = fam(cs.fontFamily); out.bodyPx = parseFloat(cs.fontSize); }
-  out.bodySmall = Array.from(document.querySelectorAll('p, li')).filter((e) => visible(e) && e.textContent.trim().length > 20 && parseFloat(getComputedStyle(e).fontSize) < (window.__MIN_BODY || 14)).length;
-  for (const img of document.images) if (img.complete && img.naturalWidth === 0 && visible(img)) out.broken.push(img.getAttribute('src')?.slice(0, 80) || '(无 src)');
+  for (const img of document.images) {
+    const src = img.getAttribute('src') || '';
+    if (img.complete && img.naturalWidth === 0 && visible(img)) out.broken.push(src.slice(0, 80) || '(无 src)');
+    else if (src && !/^(data:|https?:|blob:)/.test(src)) out.relImgs.push(src.slice(0, 60));
+  }
   out.bg = rgba(getComputedStyle(document.body).backgroundColor)[3] > 0.5 ? rgba(getComputedStyle(document.body).backgroundColor) : rgba(getComputedStyle(document.documentElement).backgroundColor);
   return out;
 }
@@ -204,28 +231,49 @@ def palette_distance(p, q):
 
 # ---------- 采集 ----------
 
-def collect(paths, viewport=(1440, 900), min_body=14):
-    from playwright.sync_api import sync_playwright
+def expand(paths):
+    """自己展开通配符：PowerShell 和加了引号的参数不会替你展开。"""
+    out = []
+    for p in paths:
+        hits = sorted(glob.glob(p)) if any(c in p for c in '*?[') else [p]
+        out += hits or [p]
+    return out
+
+
+def collect(paths, viewport=(1440, 900), min_body=14, min_label=12):
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print('体检跳过：没装 Python 版 playwright。装上后再跑：pip install playwright pillow && playwright install chromium',
+              file=sys.stderr)
+        sys.exit(0)
     results = []
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
-        for path in paths:
+        for path in expand(paths):
             page = browser.new_page(viewport={'width': viewport[0], 'height': viewport[1]})
             errors = []
             page.on('pageerror', lambda e: errors.append(str(e)[:160]))
             page.on('console', lambda m: errors.append(m.text[:160]) if m.type == 'error' else None)
-            page.add_init_script(f'window.__MIN_BODY = {min_body};')
-            page.goto(Path(path).resolve().as_uri(), wait_until='load')
+            page.add_init_script(f'window.__MIN_BODY = {min_body}; window.__MIN_LABEL = {min_label};')
             try:
-                page.evaluate('document.fonts.ready')
-            except Exception:
-                pass
-            page.wait_for_timeout(800)
-            facts = page.evaluate(COLLECT_JS)
-            shot = page.screenshot()
+                page.goto(Path(path).resolve().as_uri(), wait_until='domcontentloaded', timeout=20000)
+                try:   # 外网字体/CDN 连不上时别卡死整批，最多再等 8 秒
+                    page.wait_for_load_state('load', timeout=8000)
+                except Exception:
+                    errors.append('页面 load 超时（多半是外网字体或 CDN 连不上），按已加载的内容体检')
+                try:
+                    page.evaluate('document.fonts.ready')
+                except Exception:
+                    pass
+                page.wait_for_timeout(800)
+                facts = page.evaluate(COLLECT_JS)
+                shot = page.screenshot()
+                facts['palette'] = palette(shot)
+                facts['layout'] = layout_vector(shot)
+            except Exception as e:
+                facts = {'fatal': str(e).split('\n')[0][:200]}
             facts['errors'] = errors
-            facts['palette'] = palette(shot)
-            facts['layout'] = layout_vector(shot)
             facts['path'] = str(Path(path).resolve())
             results.append(facts)
             page.close()
@@ -247,14 +295,20 @@ def fingerprint(f):
 
 def judge(f):
     red, yellow = [], []
+    if f.get('fatal'):
+        return [f'打不开：{f["fatal"]}'], []
+    if not f['textTotal']:
+        yellow.append('页面上没有可检测的文字（全是图/画布？）——以下结论只基于截图色板')
     if f['broken']:
         red.append(f'图裂了 {len(f["broken"])} 张：{f["broken"][:3]}')
     if f['errors']:
         red.append(f'控制台报错 {len(f["errors"])} 条：{f["errors"][:2]}')
     if f['bodySmall']:
-        red.append(f'正文字号低于下限的段落 {f["bodySmall"]} 处（正文 {f.get("bodyPx")}px）')
+        red.append(f'正文字号低于下限 {len(f["bodySmall"])} 处，如 {f["bodySmall"][:2]}')
     if len(f['small']) >= 3:
-        red.append(f'小于 12px 的文字 {len(f["small"])} 处，如 {[s["text"] for s in f["small"][:3]]}')
+        red.append(f'低于标签下限的文字 {len(f["small"])} 处，如 {[(s["text"], s["px"]) for s in f["small"][:3]]}')
+    if f['relImgs']:
+        yellow.append(f'相对路径图片 {len(f["relImgs"])} 张（{f["relImgs"][:2]}）：要双击打开的单文件交付，挪个目录就全裂，改成 base64 内嵌')
     if f['lowContrast']:
         red.append(f'对比度不够 {len(f["lowContrast"])} 处，如 {f["lowContrast"][:3]}')
 
@@ -264,7 +318,7 @@ def judge(f):
         any(dist([int(x) for x in k.split(',')], CLAY) < 0.07 for k in f['textColors'])
     if cream and (clay or f['headlineSerif']):
         parts = ['暖奶油底'] + (['赤陶/陶土色点缀'] if clay else []) + (['衬线大标题'] if f['headlineSerif'] else [])
-        yellow.append('特征1·Claude 家族外观：' + '＋'.join(parts) + '——2026 年 AI 页面头号聚类')
+        yellow.append('特征1·Claude 家族外观：' + '＋'.join(parts) + '——2026 年 AI 页面聚类的第一类')
     L, C, _ = lch(bg)
     vivid = [c for c in f['palette'] if lch(c['rgb'])[1] > 0.15]
     if L < 0.2 and len(vivid) == 1:
@@ -324,16 +378,16 @@ def ledger_summary(rows):
     return '\n'.join(lines)
 
 
-def similar(a, b):
-    """返回两版撞在哪里（空表示没撞）。"""
+def similar(a, b, brand=False, ignore_layout=False):
+    """返回两版撞在哪里（空表示没撞）。brand=颜色字体受品牌约束，只比骨架；ignore_layout=App 多机并排这类骨架天然相同的形态。"""
     hits = []
     pd = palette_distance(a['palette'], b['palette'])
     lc = corr(a['layout'], b['layout'])
-    if pd < 0.06:
+    if pd < 0.06 and not brand:
         hits.append(f'色板几乎相同（距离 {pd}）')
-    if lc > 0.55:
+    if lc > 0.55 and not ignore_layout:
         hits.append(f'版式骨架高度相似（相关 {lc:.2f}）')
-    if a['bg_class'] == b['bg_class'] and a['serif'] == b['serif'] and (a['display'] or '').lower() == (b['display'] or '').lower():
+    if not brand and a['bg_class'] == b['bg_class'] and a['serif'] == b['serif'] and (a['display'] or '').lower() == (b['display'] or '').lower():
         hits.append(f'同一底色类＋同一标题字体（{a["bg_class"]}、{a["display"]}）')
     return hits, pd, lc
 
@@ -341,12 +395,12 @@ def similar(a, b):
 # ---------- 命令 ----------
 
 def cmd_check(a):
-    res = collect(a.files, a.viewport, a.min_body)
+    res = collect(a.files, a.viewport, a.min_body, a.min_label)
     worst = 0
     out = []
     for f in res:
         red, yellow = judge(f)
-        fp = fingerprint(f)
+        fp = fingerprint(f) if not f.get('fatal') else {'desc': '（打不开）'}
         worst = max(worst, 1 if red else 0)
         out.append({'path': f['path'], 'red': red, 'yellow': yellow, 'look': fp['desc']})
         if not a.json:
@@ -360,12 +414,13 @@ def cmd_check(a):
     if a.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
     elif any(o['yellow'] for o in out):
-        print('\n🟡 是「默认值而不是选择」的信号，不是禁令：brief 明确要这样就照做；否则改掉，或在交付说明里写一句为什么这里是选择。')
+        print('\n🟡 是「默认值而不是选择」的信号，不是禁令：brief 明确要这样就照做；否则改掉那个结构（比如去掉整行小标签），'
+              '或在交付说明里写一句为什么这里是选择。换个符号、换个写法躲过检测不算改。')
     return worst
 
 
 def cmd_compare(a):
-    res = collect(a.files, a.viewport, a.min_body)
+    res = [f for f in collect(a.files, a.viewport, a.min_body, a.min_label) if not f.get('fatal') or print(f'打不开，跳过：{f["path"]}：{f["fatal"]}')]
     fps = [fingerprint(f) for f in res]
     names = [Path(f['path']).name for f in res]
     print('三方向外观：')
@@ -374,14 +429,14 @@ def cmd_compare(a):
     bad = 0
     for i in range(len(fps)):
         for j in range(i + 1, len(fps)):
-            hits, pd, lc = similar(fps[i], fps[j])
+            hits, pd, lc = similar(fps[i], fps[j], a.brand, a.ignore_layout)
             print(f'  {names[i]} ↔ {names[j]}：色板距离 {pd}，骨架相关 {lc:.2f}' + (f' → 撞了：{"；".join(hits)}' if hits else ''))
             bad += bool(hits)
-    if len(fps) >= 3 and len({fp['bg_class'] for fp in fps}) == 1:
+    if len(fps) >= 3 and len({fp['bg_class'] for fp in fps}) == 1 and not a.brand:
         print(f'  🟡 三版底色是同一类（{fps[0]["bg_class"]}）——用户看到的是同一种气质的三个变体')
         bad += 1
     claude = [n for n, f in zip(names, res) if any('特征1' in y for y in judge(f)[1])]
-    if len(claude) >= 2:
+    if len(claude) >= 2 and not a.brand:
         print(f'  🟡 {len(claude)} 版都落在 Claude 家族外观（暖奶油＋衬线/陶土色）：{claude}——最多留一版')
         bad += 1
     print('  ✓ 三版拉开了' if not bad else '  → 撞了的那版回到想法卡重做：换信息组织方式或换参照池，不是换颜色')
@@ -393,7 +448,10 @@ def cmd_ledger(a):
         if not a.files or not a.project:
             print('用法：design_lint.py ledger add final.html --project 名字 [--note "…"]', file=sys.stderr)
             return 2
-        f = collect(a.files[:1], a.viewport, a.min_body)[0]
+        f = collect(a.files[:1], a.viewport, a.min_body, a.min_label)[0]
+        if f.get('fatal'):
+            print(f'打不开，没记账：{f["fatal"]}', file=sys.stderr)
+            return 2
         fp = fingerprint(f)
         p = Path(a.files[0]).resolve().parent
         if p.name == 'design-demos':
@@ -410,7 +468,7 @@ def cmd_ledger(a):
         if not rows:
             print(ledger_summary(rows))
             return 0
-        res = collect(a.files, a.viewport, a.min_body)
+        res = [f for f in collect(a.files, a.viewport, a.min_body, a.min_label) if not f.get('fatal')]
         bad = 0
         for f in res:
             fp = fingerprint(f)
@@ -428,12 +486,20 @@ def cmd_ledger(a):
 
 
 def main(argv=None):
+    for stream in (sys.stdout, sys.stderr):   # Windows 控制台默认不是 UTF-8，别让一个 emoji 把体检打崩
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
     p = argparse.ArgumentParser(description='只量事实的设计体检 + 外观指纹')
     sub = p.add_subparsers(dest='cmd', required=True)
 
     def common(sp):
         sp.add_argument('--viewport', default='1440x900', type=lambda s: tuple(int(x) for x in s.lower().split('x')))
-        sp.add_argument('--min-body', type=float, default=14, help='正文最小字号，deck 用 24')
+        sp.add_argument('--min-body', type=float, default=14, help='正文最小字号；deck 24；手机上看的 1080 宽长图 36')
+        sp.add_argument('--min-label', type=float, default=12, help='标签注释最小字号；deck 16；手机上看的 1080 宽长图 28')
+        sp.add_argument('--brand', action='store_true', help='compare：颜色字体受品牌约束，只比骨架')
+        sp.add_argument('--ignore-layout', action='store_true', help='compare：App 多机并排等骨架天然相同的形态')
         sp.add_argument('--json', action='store_true')
     c = sub.add_parser('check')
     c.add_argument('files', nargs='+')

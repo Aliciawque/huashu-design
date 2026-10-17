@@ -25,7 +25,7 @@ SIBLINGS = {
     'huashu-flow-diagram': None,
     'huashu-motion': None,
 }
-IMAGE_KEYS = ['OPENAI_API_KEY', 'GEMINI_API_KEY', 'GOOGLE_API_KEY']
+IMAGE_KEYS = ['OPENAI_API_KEY', 'GEMINI_API_KEY']   # 只报告有无；本 skill 没有直接调生图 API 的脚本，有 key 不等于能生图
 
 
 def installed_skills():
@@ -43,31 +43,36 @@ def detect():
     skills = installed_skills()
     keys = [k for k in IMAGE_KEYS if os.environ.get(k)]
     image = [s for s in IMAGE_SKILLS if s in skills]
-    in_codex = bool(os.environ.get('CODEX_HOME') or os.environ.get('CODEX_SANDBOX'))
     tools = {t: bool(shutil.which(t)) for t in ('node', 'ffmpeg', 'npx')}
-    try:
-        import playwright  # noqa: F401
-        tools['playwright(py)'] = True
-    except ImportError:
-        tools['playwright(py)'] = False
+    tools['playwright(py)'] = False
+    try:   # 包装了不够，chromium 也要在
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            tools['playwright(py)'] = Path(p.chromium.executable_path).exists()
+    except Exception:
+        pass
     siblings = {s: skills.get(s) for s in SIBLINGS}
-    tier = 'T0'
-    if image or keys or in_codex:
-        tier = 'T1'
-    if tier == 'T1' and any(siblings[s] for s in ('huashu-3djs', 'huashu-flow-diagram', 'huashu-art-motion')):
-        tier = 'T2'
-    return {'tier': tier, 'image_skills': image, 'image_keys': keys, 'codex_runtime': in_codex,
+    # 档位不是阶梯：T0 永远有；能生图（装了生图 skill）加 T1；装了兄弟 skill 加 T2
+    tier = ['T0'] + (['T1'] if image else []) + (['T2'] if any(siblings.values()) else [])
+    return {'tier': '＋'.join(tier), 'image_skills': image, 'image_keys': keys,
             'siblings': siblings, 'tools': tools}
 
 
 def main():
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding='utf-8', errors='replace')
+        except Exception:
+            pass
     r = detect()
     if '--json' in sys.argv:
         print(json.dumps(r, ensure_ascii=False, indent=2))
         return 0
-    print(f'素材档位：{r["tier"]}（T0 人人都有 / T1 能生图 / T2 还装了兄弟 skill，见 references/materials.md）')
-    img = r['image_skills'] + [f'环境变量 {k}' for k in r['image_keys']] + (['Codex 内置 image_gen'] if r['codex_runtime'] else [])
-    print('生图能力：' + ('、'.join(img) if img else '没探测到（用户说有就以用户为准）'))
+    print(f'素材档位：{r["tier"]}（T0 人人都有；T1 能生图；T2 装了兄弟 skill。见 references/materials.md）')
+    print('生图：' + ('、'.join(r['image_skills']) if r['image_skills'] else '没探测到生图 skill')
+          + '。你所在的 runtime 自带生图工具（如 Codex 的 image_gen）、或用户说有，也算 T1')
+    if r['image_keys'] and not r['image_skills']:
+        print(f'  环境里有 {"、".join(r["image_keys"])}，但本 skill 不直接调生图 API；装上 huashu-gpt-image 才算能生图')
     have = [s for s, p in r['siblings'].items() if p]
     print('兄弟 skill：' + ('、'.join(have) if have else '没有'))
     print('工具：' + '  '.join(f'{k} {"✓" if v else "✗"}' for k, v in r['tools'].items()))

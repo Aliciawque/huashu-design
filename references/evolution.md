@@ -17,8 +17,9 @@
 **开工前**（任何新设计任务，几秒钟）：
 
 ```bash
-python3 scripts/learn.py <主题词…>        # 偏好全部带出 + 和主题相关的经验
-python3 scripts/design_lint.py ledger      # 最近 8 个交付的样子，以及反复出现的那几样
+# $HD = 本 skill 的根目录（SKILL.md 所在目录），不是用户的项目目录
+python3 "$HD/scripts/learn.py" <主题词…>        # 偏好全部带出 + 和主题相关的经验
+python3 "$HD/scripts/design_lint.py" ledger      # 最近 8 个交付的样子，以及反复出现的那几样
 ```
 
 它们不阻塞：没有记录就继续。它们也不是规则：眼前的项目和条目冲突时以项目为准，然后去改条目。
@@ -28,8 +29,8 @@ python3 scripts/design_lint.py ledger      # 最近 8 个交付的样子，以�
 **收工后**（用户认可交付，或不再给意见时）：
 
 ```bash
-python3 scripts/design_lint.py ledger add <最终交付文件> --project <名字>
-python3 scripts/learn.py harvest <项目目录>     # 列出项目里能当证据的东西＋该不该记的判据
+python3 "$HD/scripts/design_lint.py" ledger add <最终交付文件> --project <名字>
+python3 "$HD/scripts/learn.py" harvest <项目目录>     # 列出项目里能当证据的东西＋该不该记的判据
 ```
 
 ## 什么值得记
@@ -60,8 +61,10 @@ python3 scripts/learn.py harvest <项目目录>     # 列出项目里能当证�
 | 三版共用骨架，被评审一眼识破「换皮」 | 盲测 | 脚本检测 | `design_lint.py compare` 骨架相关 |
 | 三版都落在暖奶油＋衬线＋陶土色 | 2026-10 盘点 | 脚本检测 | `design_lint.py check` 特征 1、`compare` 家族检查 |
 | 不同项目越做越像 | 2026-10 盘点 | 脚本检测 | 外观账本 `ledger check` |
-| 单文件交付用相对路径引 logo，挪目录全员裂图 | 盲测 | 脚本检测 | `design_lint.py check` 图裂红灯 |
+| 为了让黄灯消失，把「 · 」换成全角空格之类的符号，结构没变 | 2026-10 基准 | reference | `design_lint.py` 输出与 `references/directions.md`：黄灯要改结构或写理由，换符号不算改 |
+| 单文件交付用相对路径引 logo，挪目录全员裂图 | 盲测 | 脚本检测 | `design_lint.py check` 相对路径图片黄灯、已裂的图红灯 |
 | 安静派做过头：大片死白＋微缩字号，像渲染坏了 | 盲测 | 脚本检测 | `design_lint.py check` 字号、对比度红灯 |
+| 文档里写 `scripts/…` 相对路径，agent 在用户项目目录里跑不起来，进化机制被静默跳过 | 2026-10 独立审查 | reference | SKILL.md 所有命令用 `$HD`（skill 根目录） |
 | PPTX 导出时 svg 旁的裸文字被静默丢掉 | issue #56 | 引擎 | `pptx_from_rendered.py` 导出后自动比对 innerText |
 | 跳过方向确认直接渲长片，整片返工 | 2026-07 | 引擎 | `design-gate-hook.sh`（≥45s 渲染前查 `direction-approved.md`） |
 | 指定了风格就跳过三方向 | 2026-07 | 起手必查 | SKILL.md 窄桥：风格词不豁免 |

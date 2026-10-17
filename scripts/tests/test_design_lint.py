@@ -60,6 +60,39 @@ class LintFacts(unittest.TestCase):
         self.assertEqual(dl.bg_class((0xFA, 0xFA, 0xFA)), '浅·中性白')
 
 
+class LintEdgeCases(unittest.TestCase):
+    """独立审查报出的误报与漏报，逐条钉成回归测试。"""
+
+    def test_no_false_red_on_svg_sibling_plate_and_caption(self):
+        f = dl.collect([str(FX / 'lint_tricky_ok.html')])[0]
+        red, _ = dl.judge(f)
+        self.assertEqual(red, [])   # 放大后的 SVG 字、兄弟层深底上的白字、13px 图注都不该报红
+
+    def test_deck_div_body_and_ghost_text_go_red(self):
+        f = dl.collect([str(FX / 'lint_tricky_bad.html')], viewport=(1920, 1080), min_body=24, min_label=16)[0]
+        red, yellow = dl.judge(f)
+        text = '\n'.join(red)
+        self.assertIn('正文字号低于下限', text)   # div 写的 16px 正文
+        self.assertIn('对比度不够', text)          # 8% 透明度的白字
+        self.assertTrue(any('相对路径图片' in y for y in yellow))
+
+    def test_unreachable_stylesheet_does_not_kill_the_batch(self):
+        res = dl.collect([str(FX / 'lint_offline.html'), str(FX / 'lint_clean.html')])
+        self.assertEqual(len(res), 2)
+        self.assertNotIn('fatal', res[1])
+        self.assertEqual(dl.judge(res[1])[0], [])
+
+    def test_glob_is_expanded_by_the_script(self):
+        self.assertIn(str(FX / 'lint_clean.html'), dl.expand([str(FX / 'lint_c*.html')]))
+
+    def test_brand_mode_only_compares_skeleton(self):
+        f = dl.collect([str(FX / 'lint_slop.html')])[0]
+        a = dl.fingerprint(f)
+        self.assertTrue(dl.similar(a, a)[0])
+        b = dict(a, layout=[-x for x in a['layout']])   # 同色同字体、骨架完全不同
+        self.assertFalse(dl.similar(a, b, brand=True)[0])
+
+
 class Ledger(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -107,6 +140,15 @@ class Learn(unittest.TestCase):
         self.assertIn('同一个骨架', out)
         self.assertIn('L2', learn.local_file().read_text(encoding='utf-8'))
         self.assertNotIn('同一个骨架', learn.recall(['motion']).split('## 过去项目的经验')[1])
+
+    def test_hand_edited_heading_without_trailing_dot_keeps_its_kind(self):
+        learn.local_file().parent.mkdir(parents=True, exist_ok=True)
+        learn.local_file().write_text('# x\n\n## 手记 · preference\n\n- 原话：「要大胆」\n', encoding='utf-8')
+        self.assertEqual(learn.entries(learn.local_file(), 'local')[0]['kind'], 'preference')
+
+    def test_topic_named_like_a_subcommand_can_be_recalled(self):
+        self.assertIn('过去项目的经验', learn.recall(['status']))
+        self.assertEqual(learn.main(['--', 'status']), 0)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 # App / iOS 原型专属守则 · 完整操作手册
 
-> 从 SKILL.md 下沉的完整版。SKILL.md 保留 7 条硬规则速查，本文件是每条规则的展开：架构选型、取图渠道与代码、AppPhone JSX 骨架、ios_frame 三步用法、品位锚点全表。
+> SKILL.md 路由到这里的 App / iOS 原型完整手册：架构选型、取图渠道与代码、AppPhone JSX 骨架、ios_frame 用法、品位锚点。
+> 单文件 inline React 的三条技术红线（样式对象必须唯一命名，如 `const terminalStyles = {}`；多个 babel script 之间用 `Object.assign(window, …)` 共享组件；不用 `scrollIntoView`）和 pinned 版本见 `references/react-setup.md`，写之前先读。三方向门照走（`references/directions.md`），三版手机并排时 compare 加 `--ignore-layout`。
 
 
 做 iOS/Android/移动 app 原型时（触发：「app 原型」「iOS mockup」「移动应用」「做个 app」），下面四条**覆盖**通用 placeholder 原则——app 原型是 demo 现场，静态摆拍和米白占位卡没有说服力。

@@ -30,10 +30,10 @@ HTML deck（基础产物，永远先做）→ 完成后**自动**出 PDF → 用
 ## 硬规则
 
 - **单页内容绝不自带页码或进度标记**，页码只由外壳承载（实测出过「02/03」和「6/16」两套页码打架）
-- 正文 ≥24px，标题 60–120px（完整字号表见 `references/content-guidelines.md`「Scale 规范」）
+- 正文 ≥24px，标签注释 ≥16px，标题 60–120px（完整字号表见 `references/content-guidelines.md`「Scale 规范」）
 - 固定尺寸内容自己实现缩放＋letterbox（外壳已做）
 - 播放位置存 localStorage，刷新不丢
-- 体检时用 deck 的字号下限：`python3 scripts/design_lint.py check slides/*.html --viewport 1920x1080 --min-body 24`
+- 体检时用 deck 的字号下限：`python3 "$HD/scripts/design_lint.py" check slides/*.html --viewport 1920x1080 --min-body 24 --min-label 16`。单文件 deck-stage 只能体检当前显示的那一页，这也是默认用多文件的原因之一
 
 ## 数据页别默认成「三个大数字＋条形图」
 

@@ -51,8 +51,8 @@
 
 - HyperFrames：`npm run check`（五门审计，暗色电影风加 `--no-contrast`）→ `npx hyperframes render --fps 60` → `scripts/verify-video.sh`
 - 自研管线：`scripts/render-video.js`（25fps 中间产物）或 `scripts/render-video-seek.js --fps=60`（逐帧 seek，真 60fps、无黑帧，走 Stage 时钟时用）→ `scripts/convert-formats.sh` 派生 60fps MP4 和调色板优化 GIF
-- 带解说：`bash scripts/render-narration.sh demo.html --timeline=_narration/timeline.json [--bgm-mood=educational]`
-- 终渲后可选 AI 看片评审（云能力，自备 key、显式确认，见 SECURITY.md）：`uv run scripts/cloud/ai-review-video.py --video <成片> --context 导演稿.md --yes`；无 key 用 `scripts/verify-video.sh` 截帧人工看（`ai-video-review.md`）
+- 带解说：`bash "$HD/scripts/render-narration.sh" demo.html --timeline=_narration/timeline.json [--bgm-mood=educational]`（内部调 `scripts/mix-voiceover.sh` 混人声；单独混音也可以直接用它）
+- 终渲后可选 AI 看片评审（云能力，自备 key、显式确认，见 SECURITY.md）：`uv run "$HD/scripts/cloud/ai-review-video.py" --video <成片> --context 导演稿.md --yes`；无 key 用 `scripts/verify-video.sh` 截帧人工看（`ai-video-review.md`）
 - 完整说明：`video-export.md`
 
 **水印**：动画产出默认带「Created by Huashu-Design」（幻灯片、信息图、原型、网页一律不加）；第三方品牌的非官方致敬动画加前缀「非官方出品 · 」；用户说不要就去掉。模板见 `video-export.md` 末节。

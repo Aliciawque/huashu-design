@@ -27,6 +27,21 @@ That is the entire list. `grep -rn "https://" --include="*.py" --include="*.mjs"
 
 Both cloud scripts print exactly what will be sent to which host and exit before any network call unless you pass `--yes` or set `HUASHU_CLOUD_OK=1`. Everything else in this skill never needs the gate because it never leaves your machine.
 
+## Local files written outside the skill directory
+
+Three helper scripts keep a small local memory so the skill improves with use. None of them makes a network call; nothing is ever uploaded.
+
+| File | Written by | Contents |
+|---|---|---|
+| `~/.huashu-design/experience.md` | `scripts/learn.py add` | Taste preferences and lessons, including short **verbatim quotes of what you said** about a design. The agent is instructed to tell you when it records one, and not to record if you decline |
+| `~/.huashu-design/ledger.jsonl` | `scripts/design_lint.py ledger add` | A "look fingerprint" of each delivered design (background color class, palette, font names, a coarse layout vector), the project name and **the project's absolute path**, so new projects can avoid repeating old looks |
+
+Set `HUASHU_DESIGN_HOME` to move them; delete the folder to forget everything. Both files stay on your machine and are not part of the skill.
+
+## Environment and filesystem reads
+
+`scripts/capabilities.py` checks **whether** `OPENAI_API_KEY` / `GEMINI_API_KEY` are set (it never reads or prints their values), lists folder names in common skill directories (`~/.claude/skills`, `~/.agents/skills`, `~/.codex/skills`, `~/.cursor/skills`, and the project's `.claude/skills` / `.agents/skills`) to see which companion skills are installed, and checks for `node`, `ffmpeg`, `npx` and Playwright's Chromium. It writes nothing.
+
 ## Subprocesses
 
 All subprocess calls invoke local media tools only: `ffmpeg`, `ffprobe`, `ffplay`, Playwright/Chromium for HTML rendering and screenshots. No shell-to-network combinations, no curl-pipe-sh patterns.

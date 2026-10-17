@@ -6,30 +6,24 @@
 
 ## S1 · verified · topics: direction, color, typography
 
-- 发现：不加约束时，三个方向会一起滑向暖奶油底＋高反差衬线标题＋陶土色点缀。这是模型自己的默认审美（Anthropic 的交互配色），Anthropic 官方 frontend-design skill（2026）把它列为 AI 生成页面的头号特征。
+- 发现：不加约束时，三个方向会一起滑向暖奶油底＋高反差衬线标题＋陶土色点缀。这是模型自己的默认审美（Anthropic 的交互配色），Anthropic 官方 frontend-design skill（2026）把它列为 AI 生成页面聚类特征的第一条。
 - 下次：想法卡阶段最多允许一张落在「浅暖底＋衬线」；`design_lint.py compare` 会报家族重合。
-- 证据：skill 自测的三版咖啡站、多个真实项目的三方向截图都落在这里（2026-10 盘点）；官方原文 https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md
+- 证据：skill 开发期的内部自测与多个项目的三方向截图（2026-10 盘点，未公开）；官方原文 https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md
 
 ## S2 · verified · topics: direction, layout
 
 - 发现：三版只换配色字体、共用一个布局骨架，评审和用户都会一眼认出是换皮。差异要落在信息的组织方式上。
 - 下次：三张想法卡的「信息组织方式」必须各不相同；`compare` 的骨架相关过高就回到卡片重做。
-- 证据：盲测评审；2026-10 盘点里调研报告、说明书、数据看板三组三方向都是同一骨架。
+- 证据：skill 开发期的内部盲测与 2026-10 盘点（未公开）。
 
 ## S3 · verified · topics: readability, quiet, whitespace
 
 - 发现：安静、奢侈留白的风格做过头会变成大片死白加微缩字号，第一眼像页面没渲染完，输给普通的基线版本。
-- 下次：正文 ≥14px（deck ≥24px）、标签 ≥12px、对比度 ≥4.5:1 是任何风格都不豁免的底线；`design_lint.py check` 会亮红灯。
-- 证据：盲测评审；skill 自测咖啡站有 28 处小于 12px 的文字。
+- 下次：字号与对比度底线（网页正文 ≥14px、deck ≥24px、手机长图 ≥36px 画布像素，对比度 ≥4.5:1）任何风格都不豁免；`design_lint.py check` 会亮红灯。
+- 证据：skill 开发期的内部盲测评审（未公开）。
 
 ## S4 · verified · topics: assets, logo, single-file
 
 - 发现：要双击打开的单文件 HTML，用相对路径引用图片和 logo，挪个目录就全部裂图。
-- 下次：单文件交付一律 base64 内嵌；`design_lint.py check` 报图裂。
+- 下次：单文件交付一律 base64 内嵌；`design_lint.py check` 对相对路径图片亮黄灯、对已裂的图亮红灯。
 - 证据：盲测里六个产品按钮全部裂图直接输掉评审。
-
-## S5 · verified · topics: review, taste
-
-- 发现：审查 agent 给的高分不等于用户买账，评审打分会系统性地偏向「规整、克制」的版本。
-- 下次：评审只用来找事实问题和明显缺陷；品味的最终判断以用户的选择为准，冲突时把用户的话记成 preference。
-- 证据：多个项目里 9 分以上的版本被用户否掉、低分版本被选中。

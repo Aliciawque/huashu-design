@@ -18,7 +18,7 @@
 
 ### Phase 1 · 澄清需求＋主动索要参考
 
-一次最多 3 个问题：受众 / 核心信息 / 情感基调 / 输出格式。同时一次问全参考材料：项目叫什么、有没有 logo / 品牌色 / VI / 字体规范、有没有「就要那种感觉」的网站或截图；都没有就说一句「你看着办」。
+这是整个项目唯一的一轮提问（选定方向后不再重问，`references/workflow.md` 的题库从这里挑），一次最多 3 个问题：受众 / 核心信息 / 情感基调 / 输出格式。同时一次问全参考材料：项目叫什么、有没有 logo / 品牌色 / VI / 字体规范、有没有「就要那种感觉」的网站或截图；都没有就说一句「你看着办」。
 
 用户不回应就不枯等：按最佳判断补齐假设（标 assumption），直接往下做，用「看得见的东西」代替继续追问。
 
@@ -41,8 +41,9 @@
 开写之前先看两样东西：
 
 ```bash
-python3 scripts/learn.py direction color <题材关键词>   # 这个用户的偏好＋过去的教训
-python3 scripts/design_lint.py ledger                     # 最近交付过的样子：反复出现的那几样，这次至少一个方向彻底离开
+# $HD = 本 skill 的根目录（SKILL.md 所在目录），不是用户的项目目录
+python3 "$HD/scripts/learn.py" direction color <题材关键词>   # 这个用户的偏好＋过去的教训
+python3 "$HD/scripts/design_lint.py" ledger                     # 最近交付过的样子：反复出现的那几样，这次至少一个方向彻底离开
 ```
 
 然后在项目目录写 `directions.md`，三张卡，每张七栏：
@@ -65,9 +66,9 @@ python3 scripts/design_lint.py ledger                     # 最近交付过的�
 
 - **方向 A · 题材原生**（取代旧「最佳设计师」）：这个题材的世界里本来就有的好东西——这个行业最好的实物、界面、印刷品、空间。问「这个题材里的人自己会觉得什么最好看」。
 - **方向 B · 异域参照**（取代旧「现实参照」）：从设计圈外借：杂志与书籍设计、唱片封套、电影片头、游戏界面、博物馆导视、包装、地图、科学插图、建筑标识。获奖网站可以用，但三张卡里最多一张来自网页设计圈。用 WebSearch 核实它真实存在，拆解它的结构而不只是配色。
-- **方向 C · 轮盘破局**（保留）：跑 `date +%S`，`秒数 % 20 + 1` 从 `references/design-styles.md` 对应分区抽一号（网页 / PPT / 信息图按产出形态选）。抽到的风格如果和外观账本最近 3 个交付同类、或落在「暖奶油＋衬线＋陶土色」家族（除非品牌本身如此），顺延到下一号。抽到还原度 <70% 的要标注哪部分降级。
+- **方向 C · 轮盘破局**（保留）：取当前秒数（`date +%S`；Windows PowerShell 用 `(Get-Date).Second`），`秒数 % 20 + 1` 从 `references/design-styles.md` 对应分区抽一号（网页 / PPT / 信息图按产出形态选）。抽到的风格如果和外观账本最近 3 个交付同类、或落在「暖奶油＋衬线＋陶土色」家族（除非品牌本身如此），顺延到下一号。抽到还原度 <70% 的要标注哪部分降级。抽到的是风格，卡片上的「参照」栏写这个风格条目里的真实参照作品，大想法和信息组织方式照样要从题材里想。
 
-**用户指定了风格或品牌时**：三张卡都在那个语境里，但大想法和信息组织方式照样三选三不同；颜色可以都受品牌约束。「Apple 风格」是一个语境不是一个设计。
+**用户指定了风格或品牌时**：三张卡都在那个语境里，但大想法和信息组织方式照样三选三不同；颜色可以都受品牌约束（这时 compare 加 `--brand`，只比骨架）。方向 C 的轮盘只在和这个语境兼容的风格里抽，抽到不兼容的顺延。「Apple 风格」是一个语境不是一个设计。
 
 **写完四项自检，过了才开工**：
 
@@ -80,7 +81,7 @@ python3 scripts/design_lint.py ledger                     # 最近交付过的�
 
 - A · 题材原生｜大想法：酿造日历——一缸酱油要晒 180 天，页面就是这 180 天｜组织：时间轴｜参照：酱园门口的晒场与陶缸刻度｜反参照：不像电商详情页｜主角：真实陶缸与晒场照片｜色彩：从酱色、竹匾、盐霜里采色，低调｜胆量：一条横跨整页的 180 天刻度
 - B · 异域参照｜大想法：一张老药铺的方子｜组织：实物仿制（处方笺）｜参照：昭和时期日本药品包装｜反参照：不像 Claude 家族的暖奶油衬线页｜主角：仿制的印刷纸张、朱印、手写批注｜色彩：两色套印｜胆量：整页就是一张纸
-- C · 轮盘｜抽到「媒体级粗野主义」｜组织：杂志版面｜主角：超大汉字「酱」切进画面｜色彩：黑白加一个信号色｜胆量：字号反差
+- C · 轮盘｜抽到「媒体级粗野主义」｜大想法：一期只讲一个字的杂志——「酱」｜组织：杂志版面｜参照：风格条目里的 Bloomberg Businessweek（Richard Turley 时期）｜反参照：不像品牌官网的产品陈列页｜主角：超大汉字「酱」切进画面｜色彩：黑白加一个信号色｜胆量：字号反差
 
 ### Phase 5 · 并行构建，每版自检
 
@@ -89,7 +90,7 @@ python3 scripts/design_lint.py ledger                     # 最近交付过的�
 构建规则（三版共用）：
 
 - 用户真实内容，不用 Lorem；三版同内容只换设计
-- 可读性硬底线：正文 ≥14px（deck ≥24px）、标签 ≥12px、正文对比度 ≥4.5:1；留白要是构图，不是内容缺席
+- 可读性硬底线：网页正文 ≥14px、标签 ≥12px；deck 正文 ≥24px、标签 ≥16px；手机看的 1080 宽长图正文 ≥36px、标签 ≥28px；正文对比度 ≥4.5:1；留白要是构图，不是内容缺席
 - 单文件 HTML；单文件交付时图片和 logo base64 内嵌
 - deck 用 deck 外壳，每方向出 2 页代表页（`references/modules/deck.md`）
 - 存项目目录 `design-demos/[方向名].html`，截图 `npx playwright screenshot file:///… out.png --viewport-size=1440,900`（deck 用 1920,1080）
@@ -97,12 +98,13 @@ python3 scripts/design_lint.py ledger                     # 最近交付过的�
 三版都做完后跑：
 
 ```bash
-python3 scripts/design_lint.py check design-demos/*.html           # 红灯必修；黄灯要么改、要么在交付说明里写为什么是选择
-python3 scripts/design_lint.py compare design-demos/*.html         # 两版撞了 → 撞的那版回到想法卡，换组织方式或换参照池，不是换颜色
-python3 scripts/design_lint.py ledger check design-demos/*.html    # 全部都和最近项目撞了 → 至少一版要彻底离开
+python3 "$HD/scripts/design_lint.py" check design-demos/*.html           # 红灯必修；黄灯要么改、要么在交付说明里写为什么是选择
+python3 "$HD/scripts/design_lint.py" compare design-demos/*.html         # 两版撞了 → 撞的那版回到想法卡，换组织方式或换参照池，不是换颜色
+#   品牌约束了颜色字体加 --brand；App 原型多台手机并排加 --ignore-layout；deck 加 --viewport 1920x1080 --min-body 24 --min-label 16
+python3 "$HD/scripts/design_lint.py" ledger check design-demos/*.html    # 全部都和最近项目撞了 → 至少一版要彻底离开
 ```
 
-确认 `design-demos/` 下真有 3 个 html 再往下。
+确认 `design-demos/` 下真有 3 个 html 再往下。黄灯的意思是「改掉那个结构，或写清为什么是选择」——换个符号、换个写法躲过检测不算改。没装 Python 版 playwright 时脚本会跳过并提示安装，这时用截图肉眼对照三版，并把这件事写进交付说明。
 
 ### Phase 6 · 展示，然后停
 
