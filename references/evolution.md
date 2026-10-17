@@ -59,10 +59,13 @@ python3 "$HD/scripts/learn.py" harvest <项目目录>     # 列出项目里能�
 | 坑 | 首次 | 当前级别 | 在哪兜住 |
 |---|---|---|---|
 | 三版共用骨架，被评审一眼识破「换皮」 | 盲测 | 脚本检测 | `design_lint.py compare` 骨架相关 |
-| 三版都落在暖奶油＋衬线＋陶土色 | 2026-10 盘点 | 脚本检测 | `design_lint.py check` 特征 1、`compare` 家族检查 |
+| 三版都落在暖奶油＋衬线＋陶土色 | 2026-10 盘点 | 脚本检测 | `design_lint.py compare`「三版落在同一个外观家族」 |
 | 不同项目越做越像 | 2026-10 盘点 | 脚本检测 | 外观账本 `ledger check` |
-| 强制每版先定隐喻，页面被做成道具、地铁图在不同题目里重复出现，盲选 4 题输 3 题 | 2026-10 盲选 | reference | `references/directions.md` 三道护栏之三（最多一版用力过头） |
-| 为了让黄灯消失，把「 · 」换成全角空格之类的符号，结构没变 | 2026-10 基准 | reference | `design_lint.py` 输出与 `references/directions.md`：黄灯要改结构或写理由，换符号不算改 |
+| 强制每版先定隐喻，页面被做成道具、地铁图在不同题目里重复出现，盲选 4 题输 3 题 | 2026-10 盲选 | reference | `references/directions.md` 4d 挑三张的第 4 条（最多一张用力过头） |
+| 为躲 AI 默认外观加的配额和黄灯让三版退到浅冷规整，「太规整，太无聊了」，盲选又输 | 2026-10 盲选 | reference＋脚本 | 外观家族从黄灯降为提示；`references/directions.md` 改成六候选挑三 |
+| App 原型五六台手机等距排一排，哪个方向都显得无聊 | 2026-10 盲选 | reference | `references/app-prototype.md`「展示板」 |
+| 参照写成名字，模型做出来的是它对那个作品的平均印象 | 2026-10 盲选 | 脚本 | `scripts/ref_board.py` 截图后亲眼看；WebGL 黑屏会被检测为没看到 |
+| 为了让黄灯消失，把「 · 」换成全角空格之类的符号，结构没变 | 2026-10 基准 | reference | `design_lint.py` 输出与 `references/directions.md`：删掉那个结构，换符号不算改 |
 | 单文件交付用相对路径引 logo，挪目录全员裂图 | 盲测 | 脚本检测 | `design_lint.py check` 相对路径图片黄灯、已裂的图红灯 |
 | 安静派做过头：大片死白＋微缩字号，像渲染坏了 | 盲测 | 脚本检测 | `design_lint.py check` 字号、对比度红灯 |
 | 文档里写 `scripts/…` 相对路径，agent 在用户项目目录里跑不起来，进化机制被静默跳过 | 2026-10 独立审查 | reference | SKILL.md 所有命令用 `$HD`（skill 根目录） |

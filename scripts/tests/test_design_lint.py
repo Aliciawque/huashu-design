@@ -14,6 +14,7 @@ sys.path.insert(0, str(HERE.parent))
 
 import design_lint as dl  # noqa: E402
 import learn  # noqa: E402
+import ref_board  # noqa: E402
 
 FX = HERE / 'fixtures'
 
@@ -27,8 +28,10 @@ class LintFacts(unittest.TestCase):
     def test_slop_hits_the_2026_clusters(self):
         red, yellow = dl.judge(self.f['lint_slop.html'])
         text = '\n'.join(yellow)
-        self.assertIn('特征1', text)          # 暖奶油＋陶土色＋衬线
-        self.assertIn('特征4', text)          # 同一圆角同一阴影的卡片
+        fams = '\n'.join(dl.families(self.f['lint_slop.html']))
+        self.assertIn('暖纸衬线', fams)       # 暖奶油＋陶土色＋衬线：只作描述
+        self.assertIn('卡片套件', fams)       # 同一圆角同一阴影的卡片：只作描述
+        self.assertNotIn('暖纸衬线', text)    # 家族不再亮黄灯
         self.assertIn('特征5', text)          # 全大写小标签、中点、箭头
         self.assertIn('只给一个词换色', text)
         self.assertIn('01/02/03', text)
@@ -150,6 +153,30 @@ class Learn(unittest.TestCase):
     def test_topic_named_like_a_subcommand_can_be_recalled(self):
         self.assertIn('过去项目的经验', learn.recall(['status']))
         self.assertEqual(learn.main(['--', 'status']), 0)
+
+
+class RefBoard(unittest.TestCase):
+    def test_blank_screenshot_counts_as_not_seen(self):
+        from PIL import Image, ImageDraw
+        with tempfile.TemporaryDirectory() as d:
+            blank, real = Path(d) / 'blank.jpg', Path(d) / 'real.jpg'
+            Image.new('RGB', (1440, 900), (32, 26, 28)).save(blank)   # WebGL 站点在无头浏览器里的样子
+            im = Image.new('RGB', (1440, 900), 'white')
+            ImageDraw.Draw(im).rectangle([100, 100, 900, 600], fill=(20, 60, 200))
+            im.save(real)
+            self.assertTrue(ref_board.mostly_blank(blank))
+            self.assertFalse(ref_board.mostly_blank(real))
+
+    def test_local_image_goes_on_the_board(self):
+        from PIL import Image, ImageDraw
+        with tempfile.TemporaryDirectory() as d:
+            src = Path(d) / 'src.png'
+            im = Image.new('RGB', (800, 500), (240, 236, 228))
+            ImageDraw.Draw(im).rectangle([60, 60, 420, 440], fill=(200, 40, 40))
+            im.save(src)
+            out = Path(d) / 'refs' / 'board.jpg'
+            self.assertEqual(ref_board.main([str(FX / 'assets' / 'logo.png'), str(src), '--out', str(out)]), 0)
+            self.assertTrue(out.exists() and (out.parent / 'ref-2.jpg').exists())
 
 
 if __name__ == '__main__':

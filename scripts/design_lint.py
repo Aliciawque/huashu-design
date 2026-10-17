@@ -4,7 +4,9 @@ design_lint.py — 只量事实的设计体检，外加「外观指纹」：三�
 
 它不判断好不好看（品味归用户），只回答能核对的问题：
   红灯  图裂了、字小到读不了、对比度不够、控制台报错——交付前必须修
-  黄灯  2026 年 AI 生成页面的聚类特征（默认值而不是选择）——不是禁止，命中了要写一句「为什么这里是选择」
+  黄灯  模板装饰：全大写小标签、「A · B · C」、尾巴箭头、只给一个词换色……顺手出现的小动作，改掉几乎没有代价
+  提示  外观家族：暖纸衬线、深底单点缀、细线报纸、卡片套件。家族本身不是问题，好设计常常就在里面；
+        只有三版落进同一家族、或和外观账本里最近的项目撞了，才需要换
   指纹  底色、主色板、字体、版式骨架——给 compare 和 ledger 用
 
 用法：
@@ -313,21 +315,6 @@ def judge(f):
     if f['lowContrast']:
         red.append(f'对比度不够 {len(f["lowContrast"])} 处，如 {f["lowContrast"][:3]}')
 
-    bg = f['bg'] if f['bg'] and f['bg'][3] > 0.5 else f['palette'][0]['rgb']
-    cream = bg_class(bg) == '浅·暖纸'   # 必须是暖色相：浅冷灰（如 #DFEBE5）数值上也离奶油色很近，但不是这一类
-    clay = any(dist(c['rgb'], CLAY) < 0.07 for c in f['palette']) or \
-        any(dist([int(x) for x in k.split(',')], CLAY) < 0.07 for k in f['textColors'])
-    if cream and (clay or f['headlineSerif']):
-        parts = ['暖奶油底'] + (['赤陶/陶土色点缀'] if clay else []) + (['衬线大标题'] if f['headlineSerif'] else [])
-        yellow.append('特征1·Claude 家族外观：' + '＋'.join(parts) + '——2026 年 AI 页面聚类的第一类')
-    L, C, _ = lch(bg)
-    vivid = [c for c in f['palette'] if lch(c['rgb'])[1] > 0.15]
-    if L < 0.2 and len(vivid) == 1:
-        yellow.append(f'特征2·近黑底＋单一亮色点缀（{vivid[0]["hex"]}）')
-    if f['hairlines'] >= 8 and f['radiusTotal'] and f['radiusZero'] / f['radiusTotal'] > 0.9:
-        yellow.append(f'特征3·报纸式细线分栏：1px 细线 {f["hairlines"]} 处、零圆角')
-    if f['cardKit'] >= 4:
-        yellow.append(f'特征4·SaaS 卡片套件：同一圆角＋同一阴影重复 {f["cardKit"]} 次')
     chrome = []
     if len(f['eyebrows']) >= 3:
         chrome.append(f'全大写拉字距小标签 {len(f["eyebrows"])} 个（{f["eyebrows"][:3]}）')
@@ -348,6 +335,29 @@ def judge(f):
     if f['display'] and f['display'].lower() in ('inter', 'roboto', 'arial', 'helvetica', 'system-ui', '-apple-system'):
         yellow.append(f'标题字体是 {f["display"]}（UI 小字体当 display）')
     return red, yellow
+
+
+def families(f):
+    """这一版落在哪个常见外观家族里。只是描述，不是毛病：用来比三版、比账本。"""
+    if f.get('fatal') or not f.get('palette'):
+        return []
+    out = []
+    bg = f['bg'] if f['bg'] and f['bg'][3] > 0.5 else f['palette'][0]['rgb']
+    cream = bg_class(bg) == '浅·暖纸'   # 必须是暖色相：浅冷灰（如 #DFEBE5）数值上也离奶油色很近，但不是这一类
+    clay = any(dist(c['rgb'], CLAY) < 0.07 for c in f['palette']) or \
+        any(dist([int(x) for x in k.split(',')], CLAY) < 0.07 for k in f['textColors'])
+    if cream and (clay or f['headlineSerif']):
+        parts = ['暖奶油底'] + (['赤陶/陶土色点缀'] if clay else []) + (['衬线大标题'] if f['headlineSerif'] else [])
+        out.append('暖纸衬线·' + '＋'.join(parts) + '（也是 Claude 自己的配色）')
+    L, C, _ = lch(bg)
+    vivid = [c for c in f['palette'] if lch(c['rgb'])[1] > 0.15]
+    if L < 0.2 and len(vivid) == 1:
+        out.append(f'深底单点缀·近黑底＋单一亮色点缀（{vivid[0]["hex"]}）')
+    if f['hairlines'] >= 8 and f['radiusTotal'] and f['radiusZero'] / f['radiusTotal'] > 0.9:
+        out.append(f'细线报纸·1px 细线 {f["hairlines"]} 处、零圆角')
+    if f['cardKit'] >= 4:
+        out.append(f'卡片套件·同一圆角＋同一阴影重复 {f["cardKit"]} 次')
+    return out
 
 
 # ---------- 外观账本 ----------
@@ -403,20 +413,22 @@ def cmd_check(a):
         red, yellow = judge(f)
         fp = fingerprint(f) if not f.get('fatal') else {'desc': '（打不开）'}
         worst = max(worst, 1 if red else 0)
-        out.append({'path': f['path'], 'red': red, 'yellow': yellow, 'look': fp['desc']})
+        out.append({'path': f['path'], 'red': red, 'yellow': yellow, 'families': families(f), 'look': fp['desc']})
         if not a.json:
             print(f'\n■ {f["path"]}\n  样子：{fp["desc"]}')
             for r in red:
                 print(f'  🔴 {r}')
             for y in yellow:
                 print(f'  🟡 {y}')
+            for i in families(f):
+                print(f'  ℹ️  外观家族 {i}')
             if not red and not yellow:
-                print('  ✓ 没有红灯，也没命中 AI 默认特征')
+                print('  ✓ 没有红灯，也没有模板装饰')
     if a.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
     elif any(o['yellow'] for o in out):
-        print('\n🟡 是「默认值而不是选择」的信号，不是禁令：brief 明确要这样就照做；否则改掉那个结构（比如去掉整行小标签），'
-              '或在交付说明里写一句为什么这里是选择。换个符号、换个写法躲过检测不算改。')
+        print('\n🟡 模板装饰是顺手的小动作：brief 要这样就照做，否则删掉那个结构（比如整行小标签），换个符号躲过检测不算改。'
+              '\nℹ️  外观家族不用改，它只在 compare / ledger check 里有意义。')
     return worst
 
 
@@ -436,9 +448,10 @@ def cmd_compare(a):
     if len(fps) >= 3 and len({fp['bg_class'] for fp in fps}) == 1 and not a.brand:
         print(f'  🟡 三版底色是同一类（{fps[0]["bg_class"]}）——用户看到的是同一种气质的三个变体')
         bad += 1
-    claude = [n for n, f in zip(names, res) if any('特征1' in y for y in judge(f)[1])]
-    if len(claude) >= 2 and not a.brand:
-        print(f'  🟡 {len(claude)} 版都落在 Claude 家族外观（暖奶油＋衬线/陶土色）：{claude}——最多留一版')
+    fams = [{x.split('·')[0] for x in families(f)} for f in res]
+    shared = set.intersection(*fams) if len(fams) >= 3 else set()
+    if shared and not a.brand:
+        print(f'  🟡 三版落在同一个外观家族（{"、".join(sorted(shared))}）——留一两版在里面没关系，三版都在就是一种气质的三个变体')
         bad += 1
     print('  ✓ 三版拉开了' if not bad else '  → 撞了的那版回到方向卡重做：换骨架或换来源，不是换颜色')
     return 1 if bad else 0
